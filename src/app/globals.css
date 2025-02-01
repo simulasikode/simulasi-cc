@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #fefdfa;
+  --foreground: #191919;
+  --primary: #e8e8e8;
+}
+
+.light {
+  --background: #fefdfa;
+  --foreground: #191919;
+  --primary: #e8e8e8;
+}
+
+.dark {
+  --background: #191919;
+  --foreground: #fefdfa;
+  --primary: #303030;
+}
+
+.red {
+  --background: #ffe6e6;
+  --foreground: #ff0000;
+  --primary: #ffcccc;
+}
+
+.green {
+  --background: #f0fff0;
+  --foreground: #009900;
+  --primary: #ccebcc;
+}
+
+.blue {
+  --background: #e6e6ff;
+  --foreground: #0000ff;
+  --primary: #ccccff;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
