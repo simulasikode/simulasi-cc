@@ -1,17 +1,21 @@
-"use client"; // MDX requires client-side rendering
+"use client";
+import { useEffect, useState } from "react";
 
-import { MDXProvider } from "@mdx-js/react";
-import Layout from "@/components/Layout";
-import ChangelogContent from "./Changelog.mdx"; // Import the MDX file
+export default function ChangelogPage() {
+  const [changelog, setChangelog] = useState("");
 
-const ChangelogPage = () => {
+  useEffect(() => {
+    fetch(
+      "https://raw.githubusercontent.com/simulasikode/simulasi-cc/main/CHANGELOG.md",
+    )
+      .then((res) => res.text())
+      .then((data) => setChangelog(data));
+  }, []);
+
   return (
-    <MDXProvider>
-      <Layout>
-        <ChangelogContent />
-      </Layout>
-    </MDXProvider>
+    <div className="prose mx-auto p-4">
+      <h1>Changelog</h1>
+      <pre className="whitespace-pre-wrap">{changelog}</pre>
+    </div>
   );
-};
-
-export default ChangelogPage;
+}

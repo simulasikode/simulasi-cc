@@ -1,5 +1,5 @@
 {
-  "name": "studio-page",
+  "name": "simulasi.studio",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -11,10 +11,8 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "@mdx-js/loader": "^3.1.0",
-    "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^15.1.6",
-    "@types/mdx": "^2.0.13",
+    "firebase": "^11.2.0",
     "gsap": "^3.12.7",
     "lodash": "^4.17.21",
     "lucide-react": "^0.474.0",
@@ -27,12 +25,11 @@
     "@eslint/eslintrc": "^3",
     "@types/lodash": "^4.17.15",
     "@types/node": "^20",
-    "@types/react": "^19",
+    "@types/react": "^19.0.8",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",
-    "release-please": "^16.15.0",
     "standard-version": "^9.5.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
