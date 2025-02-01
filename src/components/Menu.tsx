@@ -3,14 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { X } from "lucide-react";
-import { FaInstagram, FaTwitter, FaGithub, FaYoutube } from "react-icons/fa";
+import { FaInstagram, FaGithub, FaYoutube, FaTiktok } from "react-icons/fa";
 import RGBBackground from "@/components/RGBBackground";
 
 const socialLinks = [
   {
-    name: "Twitter",
-    url: "https://twitter.com",
-    icon: <FaTwitter size={24} />,
+    name: "Instagram",
+    url: "https://instagram.com/simulasi.studio",
+    icon: <FaInstagram size={24} />,
   },
   {
     name: "Youtube",
@@ -18,11 +18,15 @@ const socialLinks = [
     icon: <FaYoutube size={24} />,
   },
   {
-    name: "Instagram",
-    url: "https://instagram.com/simulasi.studio",
-    icon: <FaInstagram size={24} />,
+    name: "Tiktok",
+    url: "https://tiktok.com",
+    icon: <FaTiktok size={24} />,
   },
-  { name: "GitHub", url: "https://github.com", icon: <FaGithub size={24} /> },
+  {
+    name: "GitHub",
+    url: "https://github.com/simulasikode",
+    icon: <FaGithub size={24} />,
+  },
 ];
 
 // Menu sections with links
@@ -30,28 +34,27 @@ const menuSections = [
   {
     title: "Studio",
     items: [
-      { name: "Home", link: "/" },
       { name: "About Us", link: "/about" },
-      { name: "Careers", link: "/careers" },
-      { name: "Contact", link: "/contact" },
+      { name: "Case Studies", link: "/case-studies" },
+      { name: "Portfolio", link: "/portfolio" },
+      { name: "Product", link: "/product" },
     ],
   },
   {
     title: "Services",
     items: [
-      { name: "Web Development", link: "/services/web-development" },
-      { name: "UI/UX Design", link: "/services/ui-ux" },
-      { name: "SEO", link: "/services/seo" },
-      { name: "Marketing", link: "/services/marketing" },
+      { name: "Prize", link: "/service/prize" },
+      { name: "Simulasi CC", link: "/services/sim-cc" },
+      { name: "Request", link: "/services/Request" },
     ],
   },
   {
-    title: "Resources",
+    title: "Pre-Press",
     items: [
-      { name: "Blog", link: "/blog" },
-      { name: "Case Studies", link: "/case-studies" },
-      { name: "E-books", link: "/ebooks" },
-      { name: "Webinars", link: "/webinars" },
+      { name: "Foreword", link: "/foreword" },
+      { name: "Color", link: "/color" },
+      { name: "Paper", link: "/paper" },
+      { name: "Priting", link: "/printing" },
     ],
   },
 ];
