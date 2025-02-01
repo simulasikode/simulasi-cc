@@ -1,0 +1,19 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Release Please
+        uses: GoogleCloudPlatform/release-please-action@v3
+        with:
+          release-type: node  # Change this if you're using a different language
+          token: ${{ secrets.GITHUB_TOKEN }}
