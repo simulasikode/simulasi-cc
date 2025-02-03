@@ -3,39 +3,39 @@
 @tailwind utilities;
 
 :root {
-  --background: #fefdfa;
+  --background: #f7f3e3;
   --foreground: #191919;
-  --primary: #e8e8e8;
+  --primary: #5e5e5e;
 }
 
 .light {
-  --background: #fefdfa;
+  --background: #f7f3e3;
   --foreground: #191919;
-  --primary: #e8e8e8;
-}
-
-.dark {
-  --background: #191919;
-  --foreground: #fefdfa;
-  --primary: #303030;
+  --primary: #5e5e5e;
 }
 
 .red {
   --background: #ffe6e6;
   --foreground: #ff0000;
-  --primary: #ffcccc;
+  --primary: #ff4d4d;
 }
 
 .green {
   --background: #f0fff0;
   --foreground: #009900;
-  --primary: #ccebcc;
+  --primary: #4db84d;
 }
 
 .blue {
   --background: #e6e6ff;
   --foreground: #0000ff;
-  --primary: #ccccff;
+  --primary: #4d4dff;
+}
+
+.dark {
+  --background: #191919;
+  --foreground: #f7f3e3;
+  --primary: #adaa9f;
 }
 
 body {

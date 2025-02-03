@@ -90,7 +90,7 @@ export default function ThemeSwitcher() {
   };
 
   return (
-    <div className="fixed top-0 left-0 z-10 p-2">
+    <div className="fixed top-0 left-0 z-10 p-4">
       <div className="flex items-center space-x-4">
         <button
           onClick={toggleTheme}
@@ -98,9 +98,6 @@ export default function ThemeSwitcher() {
         >
           {themeIcons[theme]}
         </button>
-        <span className="text-sm font-medium">
-          {theme.charAt(0).toUpperCase() + theme.slice(1)} Theme
-        </span>
       </div>
     </div>
   );

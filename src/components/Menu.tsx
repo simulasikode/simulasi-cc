@@ -37,15 +37,15 @@ const menuSections = [
       { name: "About Us", link: "/about" },
       { name: "Case Studies", link: "/case-studies" },
       { name: "Portfolio", link: "/portfolio" },
-      { name: "Product", link: "/product" },
     ],
   },
   {
     title: "Services",
     items: [
-      { name: "Prize", link: "/service/prize" },
-      { name: "Simulasi CC", link: "/services/sim-cc" },
+      { name: "Price", link: "/service/price" },
+      { name: "Solid Process", link: "/services/solid-process" },
       { name: "Request", link: "/services/Request" },
+      { name: "Product", link: "/product" },
     ],
   },
   {
@@ -54,7 +54,7 @@ const menuSections = [
       { name: "Foreword", link: "/foreword" },
       { name: "Color", link: "/color" },
       { name: "Paper", link: "/paper" },
-      { name: "Priting", link: "/printing" },
+      { name: "Printing", link: "/printing" },
     ],
   },
 ];
@@ -82,28 +82,15 @@ export default function Menu() {
       tl.fromTo(
         menuItemsRef.current,
         { opacity: 0, y: 50, scale: 0.95 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.5,
-          stagger: 0.08,
-        },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08 },
         "-=0.2",
       );
 
-      // Add animation for social icons when menu opens
       tl.fromTo(
         socialIconsRef.current,
         { opacity: 0, y: 50, scale: 0.95 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.5,
-          stagger: 0.08,
-        },
-        "-=0.2", // Starts slightly before previous animations finish
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08 },
+        "-=0.2",
       );
     } else {
       tl.to(menuItemsRef.current, {
@@ -115,22 +102,15 @@ export default function Menu() {
       });
 
       tl.to(
-        menuRef.current,
-        { y: "-100%", opacity: 1, duration: 0.4 },
-        "-=0.4",
+        socialIconsRef.current,
+        { opacity: 0, y: -8, scale: 0.95, duration: 0.3, stagger: 0.05 },
+        "-=0.2",
       );
 
-      // Reverse animation for social icons when menu closes
       tl.to(
-        socialIconsRef.current,
-        {
-          opacity: 0,
-          y: -8,
-          scale: 0.95,
-          duration: 0.3,
-          stagger: 0.05,
-        },
-        "-=0.4",
+        menuRef.current,
+        { y: "-100%", opacity: 0, duration: 0.4 }, // 👈 Fix opacity flicker
+        "-=0.3",
       );
     }
   }, [isOpen]);
@@ -140,7 +120,7 @@ export default function Menu() {
       {/* Menu Toggle Button */}
       {!isOpen && (
         <button
-          className="fixed top-2 right-2 z-50 transition"
+          className="fixed top-2 right-2 z-40 transition text-xl"
           onClick={() => setIsOpen(true)}
         >
           ☰ Menu
@@ -150,6 +130,7 @@ export default function Menu() {
       <div
         ref={menuRef}
         className="fixed top-0 left-0 z-50 h-full w-full bg-background/78 text-foreground transform -translate-y-full transition-transform duration-500 backdrop-blur-xl p-10 opacity-0 items-center"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
@@ -160,7 +141,7 @@ export default function Menu() {
         </button>
 
         {/* 4 Sections Menu Items */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-5xl text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-5xl text-left">
           {menuSections.map((section, sectionIndex) => (
             <div key={sectionIndex} className="space-y-4">
               <h3 className="text-xl font-bold">{section.title}</h3>
@@ -175,7 +156,7 @@ export default function Menu() {
                           menuItemsRef.current[refIndex] = el;
                         }
                       }}
-                      className="text-lg hover:text-gray-400 transition-colors cursor-pointer"
+                      className="text-lg hover:text-primary transition-colors cursor-pointer"
                     >
                       <Link href={item.link} onClick={() => setIsOpen(false)}>
                         {item.name}
@@ -197,10 +178,10 @@ export default function Menu() {
               target="_blank"
               aria-label={social.name}
               rel="noopener noreferrer"
-              className="hover:text-primary transition-colors"
+              className="hover:text-primary transition-all duration-300 transform hover:-translate-y-1 hover:scale-110 hover:rotate-3"
               ref={(el) => {
                 if (el) {
-                  socialIconsRef.current[index] = el; // Properly accessing index
+                  socialIconsRef.current[index] = el;
                 }
               }}
             >
