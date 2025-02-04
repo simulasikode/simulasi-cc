@@ -13,8 +13,7 @@ export default function ChangelogPage() {
   }, []);
 
   return (
-    <div className="prose mx-auto p-4">
-      <h1>Changelog</h1>
+    <div className="prose p-16 max-w-5xl">
       <pre className="whitespace-pre-wrap">{changelog}</pre>
     </div>
   );

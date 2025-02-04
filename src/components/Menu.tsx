@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react"; // Import useGSAP
 import { X } from "lucide-react";
 import { FaInstagram, FaGithub, FaYoutube, FaTiktok } from "react-icons/fa";
 import RGBBackground from "@/components/RGBBackground";
@@ -29,7 +30,6 @@ const socialLinks = [
   },
 ];
 
-// Menu sections with links
 const menuSections = [
   {
     title: "Studio",
@@ -59,65 +59,59 @@ const menuSections = [
   },
 ];
 
-const extraLinks = {
-  title: "More",
-  items: [
-    { name: "Privacy Policy", link: "/privacy-policy" },
-    { name: "Changelog", link: "/changelog" },
-  ],
-};
-
 export default function Menu() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuItemsRef = useRef<(HTMLLIElement | null)[]>([]);
-  const socialIconsRef = useRef<(HTMLAnchorElement | null)[]>([]); // Fixed Ref Type
+  const socialIconsRef = useRef<(HTMLAnchorElement | null)[]>([]);
 
-  useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    if (isOpen) {
-      tl.to(menuRef.current, { y: "0%", opacity: 1, duration: 0.5 });
+      if (isOpen) {
+        tl.to(menuRef.current, { y: "0%", opacity: 1, duration: 0.5 });
 
-      tl.fromTo(
-        menuItemsRef.current,
-        { opacity: 0, y: 50, scale: 0.95 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08 },
-        "-=0.2",
-      );
+        tl.fromTo(
+          menuItemsRef.current,
+          { opacity: 0, y: 50, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08 },
+          "-=0.2",
+        );
 
-      tl.fromTo(
-        socialIconsRef.current,
-        { opacity: 0, y: 50, scale: 0.95 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08 },
-        "-=0.2",
-      );
-    } else {
-      tl.to(menuItemsRef.current, {
-        opacity: 0,
-        y: -10,
-        scale: 0.95,
-        duration: 0.3,
-        stagger: 0.05,
-      });
+        tl.fromTo(
+          socialIconsRef.current,
+          { opacity: 0, y: 50, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08 },
+          "-=0.2",
+        );
+      } else {
+        tl.to(menuItemsRef.current, {
+          opacity: 0,
+          y: -10,
+          scale: 0.95,
+          duration: 0.3,
+          stagger: 0.05,
+        });
 
-      tl.to(
-        socialIconsRef.current,
-        { opacity: 0, y: -8, scale: 0.95, duration: 0.3, stagger: 0.05 },
-        "-=0.2",
-      );
+        tl.to(
+          socialIconsRef.current,
+          { opacity: 0, y: -8, scale: 0.95, duration: 0.3, stagger: 0.05 },
+          "-=0.2",
+        );
 
-      tl.to(
-        menuRef.current,
-        { y: "-100%", opacity: 0, duration: 0.4 }, // 👈 Fix opacity flicker
-        "-=0.3",
-      );
-    }
-  }, [isOpen]);
+        tl.to(
+          menuRef.current,
+          { y: "-100%", opacity: 0, duration: 0.4 },
+          "-=0.3",
+        );
+      }
+    },
+    { dependencies: [isOpen], scope: menuRef }, // Dependencies & Scoped Animation
+  );
 
   return (
     <>
-      {/* Menu Toggle Button */}
       {!isOpen && (
         <button
           className="fixed top-2 right-2 z-40 transition text-xl"
@@ -126,13 +120,11 @@ export default function Menu() {
           ☰ Menu
         </button>
       )}
-      {/* Full-Screen Menu */}
       <div
         ref={menuRef}
-        className="fixed top-0 left-0 z-50 h-full w-full bg-background/78 text-foreground transform -translate-y-full transition-transform duration-500 backdrop-blur-xl p-10 opacity-0 items-center"
+        className="absolute top-0 left-0 z-50 h-full w-full bg-background/78 text-foreground transform -translate-y-full transition-transform duration-500 backdrop-blur-xl p-10 opacity-0 items-center"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
         <button
           className="absolute top-2 right-2 text-foreground hover:text-gray-400 transition"
           onClick={() => setIsOpen(false)}
@@ -140,7 +132,6 @@ export default function Menu() {
           <X size={32} />
         </button>
 
-        {/* 4 Sections Menu Items */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-5xl text-left">
           {menuSections.map((section, sectionIndex) => (
             <div key={sectionIndex} className="space-y-4">
@@ -152,9 +143,7 @@ export default function Menu() {
                     <li
                       key={item.name}
                       ref={(el) => {
-                        if (el) {
-                          menuItemsRef.current[refIndex] = el;
-                        }
+                        if (el) menuItemsRef.current[refIndex] = el;
                       }}
                       className="text-lg hover:text-primary transition-colors cursor-pointer"
                     >
@@ -169,7 +158,6 @@ export default function Menu() {
           ))}
         </div>
 
-        {/* Social Media Links */}
         <div className="mt-12 flex space-x-6">
           {socialLinks.map((social, index) => (
             <a
@@ -180,9 +168,7 @@ export default function Menu() {
               rel="noopener noreferrer"
               className="hover:text-primary transition-all duration-300 transform hover:-translate-y-1 hover:scale-110 hover:rotate-3"
               ref={(el) => {
-                if (el) {
-                  socialIconsRef.current[index] = el;
-                }
+                if (el) socialIconsRef.current[index] = el;
               }}
             >
               {social.icon}
@@ -190,23 +176,26 @@ export default function Menu() {
           ))}
         </div>
 
-        {/* Copyright */}
-        <p className="absolute bottom-6 text-sm text-foreground">
-          © {new Date().getFullYear()} Simulasi Studio. All rights reserved.
-        </p>
-        <div className="absolute bottom-6 right-4 flex items-center gap-2 ">
-          <ul className="space-y-2">
-            {extraLinks.items.map((item) => (
-              <li
-                key={item.name}
-                className="text-sm hover:text-gray-400 transition-colors cursor-pointer"
-              >
-                <Link href={item.link} onClick={() => setIsOpen(false)}>
-                  {item.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="absolute bottom-6 left-0 w-full px-6 flex  justify-between items-center gap-4">
+          <p className="text-sm text-foreground">
+            © {new Date().getFullYear()} Simulasi Studio. All rights reserved.
+          </p>
+          <div className="flex gap-2 md:gap-4">
+            <Link
+              href="/privacy-policy"
+              onClick={() => setIsOpen(false)}
+              className="text-sm"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/changelog"
+              onClick={() => setIsOpen(false)}
+              className="text-sm"
+            >
+              Change Log
+            </Link>
+          </div>
         </div>
         <RGBBackground />
       </div>

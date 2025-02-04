@@ -88,7 +88,7 @@ const RGBBackground = () => {
     <div className="fixed inset-0 w-full h-full overflow-hidden -z-10 pointer-events-none blur-3xl">
       <svg
         ref={rgbRef}
-        className="absolute inset-0 w-full h-full"
+        className="relative inset-0 w-full h-full"
         viewBox="0 0 600 600"
         aria-hidden="true"
       >

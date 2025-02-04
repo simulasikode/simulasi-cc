@@ -10,6 +10,7 @@
     "release": "standard-version"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@heroicons/react": "^2.2.0",
     "@next/mdx": "^15.1.6",
     "firebase": "^11.2.0",
