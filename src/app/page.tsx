@@ -1,22 +1,34 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="relative">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/simulasi.svg"
-          alt="simulasi logo"
-          width={42}
-          height={42}
-          priority
-        />
-        <ol className="list-inside list-decimal text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">This is unfinish website.</li>
-          <li className="mb-2">Bookmark and see what we build.</li>
-          <li>You can play with theme.</li>
-        </ol>
+        <section className="relative w-full min-h-[70vh] flex flex-col items-center justify-center text-center px-4 sm:px-8 bg-background">
+          <h1 className="text-3xl sm:text-[65px] leading-[80%] tracking-tighter font-bold text-foreground">
+            THE SCREEN PRINTING JOURNAL
+            <br />
+            <span className="text-primary">FROM SIMULASI STUDIO</span>
+          </h1>
+          <p className="mt-3 text-regular text-sm text-muted-foreground max-w-xl">
+            Tradition meets innovation—bringing unique prints to life with
+            precision and passion.
+          </p>
+          <div className="mt-5 flex gap-3">
+            <Link
+              href="/portfolio"
+              className="px-5 py-2.5 text-sm sm:text-base font-medium bg-primary text-background rounded-md hover:opacity-90 transition"
+            >
+              View Portfolio
+            </Link>
+            <Link
+              href="/contact"
+              className="px-5 py-2.5 text-sm sm:text-base font-medium border border-primary text-primary rounded-md hover:bg-primary hover:text-background transition"
+            >
+              Get a Quote
+            </Link>
+          </div>
+        </section>
       </main>
     </div>
   );

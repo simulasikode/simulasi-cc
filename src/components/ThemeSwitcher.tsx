@@ -90,15 +90,13 @@ export default function ThemeSwitcher() {
   };
 
   return (
-    <div className="fixed top-0 left-0 z-10 p-4">
-      <div className="flex items-center space-x-4">
-        <button
-          onClick={toggleTheme}
-          className="hover:bg-opacity-80 transition-colors duration-200 flex items-center justify-center"
-        >
-          {themeIcons[theme]}
-        </button>
-      </div>
+    <div className="fixed top-4 left-4 z-10">
+      <button
+        onClick={toggleTheme}
+        className="hover:bg-opacity-80 transition-colors duration-200 cursor-pointer"
+      >
+        {themeIcons[theme]}
+      </button>
     </div>
   );
 }

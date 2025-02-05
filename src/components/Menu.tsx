@@ -1,10 +1,12 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
-import { useGSAP } from "@gsap/react"; // Import useGSAP
+import { useGSAP } from "@gsap/react";
 import { X } from "lucide-react";
-import { FaInstagram, FaGithub, FaYoutube, FaTiktok } from "react-icons/fa";
+import { FaInstagram, FaGithub, FaYoutube } from "react-icons/fa";
+import { TbMenu } from "react-icons/tb";
+import Image from "next/image";
 import RGBBackground from "@/components/RGBBackground";
 
 const socialLinks = [
@@ -15,13 +17,8 @@ const socialLinks = [
   },
   {
     name: "Youtube",
-    url: "https://youtube.com",
+    url: "https://www.youtube.com/@simulasistudio",
     icon: <FaYoutube size={24} />,
-  },
-  {
-    name: "Tiktok",
-    url: "https://tiktok.com",
-    icon: <FaTiktok size={24} />,
   },
   {
     name: "GitHub",
@@ -44,7 +41,7 @@ const menuSections = [
     items: [
       { name: "Price", link: "/service/price" },
       { name: "Solid Process", link: "/services/solid-process" },
-      { name: "Request", link: "/services/Request" },
+      { name: "Request", link: "/services/request" },
       { name: "Product", link: "/product" },
     ],
   },
@@ -64,6 +61,33 @@ export default function Menu() {
   const menuRef = useRef<HTMLDivElement>(null);
   const menuItemsRef = useRef<(HTMLLIElement | null)[]>([]);
   const socialIconsRef = useRef<(HTMLAnchorElement | null)[]>([]);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuTextRef = useRef<HTMLSpanElement>(null);
+
+  useGSAP(() => {
+    gsap.set(menuTextRef.current, { opacity: 0, x: -10 });
+  }, []);
+
+  const handleHover = (show: boolean) => {
+    gsap.to(menuTextRef.current, {
+      opacity: show ? 1 : 0,
+      x: show ? 0 : 10,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  };
+
+  // Automatically hide "Menu" text when menu closes
+  useEffect(() => {
+    if (!isOpen) {
+      gsap.to(menuTextRef.current, {
+        opacity: 0,
+        x: -10,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    }
+  }, [isOpen]);
 
   useGSAP(
     () => {
@@ -71,14 +95,12 @@ export default function Menu() {
 
       if (isOpen) {
         tl.to(menuRef.current, { y: "0%", opacity: 1, duration: 0.5 });
-
         tl.fromTo(
           menuItemsRef.current,
           { opacity: 0, y: 50, scale: 0.95 },
           { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08 },
           "-=0.2",
         );
-
         tl.fromTo(
           socialIconsRef.current,
           { opacity: 0, y: 50, scale: 0.95 },
@@ -93,13 +115,11 @@ export default function Menu() {
           duration: 0.3,
           stagger: 0.05,
         });
-
         tl.to(
           socialIconsRef.current,
           { opacity: 0, y: -8, scale: 0.95, duration: 0.3, stagger: 0.05 },
           "-=0.2",
         );
-
         tl.to(
           menuRef.current,
           { y: "-100%", opacity: 0, duration: 0.4 },
@@ -107,36 +127,66 @@ export default function Menu() {
         );
       }
     },
-    { dependencies: [isOpen], scope: menuRef }, // Dependencies & Scoped Animation
+    { dependencies: [isOpen], scope: menuRef },
   );
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isOpen) setIsOpen(false);
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen]);
 
   return (
     <>
       {!isOpen && (
         <button
-          className="fixed top-2 right-2 z-40 transition text-xl"
+          ref={menuButtonRef}
+          className="fixed top-4 right-4 z-40 flex items-center gap-2 text-lg cursor-pointer transition"
           onClick={() => setIsOpen(true)}
+          onMouseEnter={() => handleHover(true)}
+          onMouseLeave={() => handleHover(false)}
+          aria-label="Open menu"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && setIsOpen(true)}
         >
-          ☰ Menu
+          <span ref={menuTextRef} className="text-base transition-opacity">
+            Menu
+          </span>
+          <TbMenu size={24} />
         </button>
       )}
       <div
         ref={menuRef}
-        className="absolute top-0 left-0 z-50 h-full w-full bg-background/78 text-foreground transform -translate-y-full transition-transform duration-500 backdrop-blur-xl p-10 opacity-0 items-center"
+        className="fixed inset-0 z-50 h-full w-full bg-background/78 text-foreground transform -translate-y-full transition-transform duration-500 backdrop-blur-xl p-6 opacity-0"
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          className="absolute top-2 right-2 text-foreground hover:text-gray-400 transition"
+          className="absolute top-2 right-2 text-foreground hover:text-primary transition cursor-pointer"
           onClick={() => setIsOpen(false)}
+          aria-label="Close menu"
         >
           <X size={32} />
         </button>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-5xl text-left">
+        <div className="top-0 mb-16">
+          <Link href="/" onClick={() => setIsOpen(false)}>
+            <Image
+              className="dark:invert"
+              src="/simulasi.svg"
+              alt="Simulasi Studio Logo"
+              width={42}
+              height={42}
+              priority
+            />
+          </Link>{" "}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-md sm:max-w-lg md:max-w-5xl text-left">
           {menuSections.map((section, sectionIndex) => (
-            <div key={sectionIndex} className="space-y-4">
-              <h3 className="text-xl font-bold">{section.title}</h3>
-              <ul className="space-y-2">
+            <div key={sectionIndex} className="space-y-3">
+              <h3 className="text-lg sm:text-xl font-bold">{section.title}</h3>
+              <ul className="space-y-1 sm:space-y-2">
                 {section.items.map((item, index) => {
                   const refIndex = sectionIndex * section.items.length + index;
                   return (
@@ -145,7 +195,7 @@ export default function Menu() {
                       ref={(el) => {
                         if (el) menuItemsRef.current[refIndex] = el;
                       }}
-                      className="text-lg hover:text-primary transition-colors cursor-pointer"
+                      className="text-base sm:text-lg hover:text-primary transition-colors cursor-pointer"
                     >
                       <Link href={item.link} onClick={() => setIsOpen(false)}>
                         {item.name}
@@ -157,8 +207,7 @@ export default function Menu() {
             </div>
           ))}
         </div>
-
-        <div className="mt-12 flex space-x-6">
+        <div className="mt-10 flex justify-start space-x-4 sm:space-x-6">
           {socialLinks.map((social, index) => (
             <a
               key={social.name}
@@ -166,7 +215,7 @@ export default function Menu() {
               target="_blank"
               aria-label={social.name}
               rel="noopener noreferrer"
-              className="hover:text-primary transition-all duration-300 transform hover:-translate-y-1 hover:scale-110 hover:rotate-3"
+              className="hover:text-primary transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
               ref={(el) => {
                 if (el) socialIconsRef.current[index] = el;
               }}
@@ -176,26 +225,26 @@ export default function Menu() {
           ))}
         </div>
 
-        <div className="absolute bottom-6 left-0 w-full px-6 flex  justify-between items-center gap-4">
-          <p className="text-sm text-foreground">
+        <div className="absolute bottom-4 left-0 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between w-full text-sm text-muted-foreground">
+          <span>
             © {new Date().getFullYear()} Simulasi Studio. All rights reserved.
-          </p>
-          <div className="flex gap-2 md:gap-4">
+          </span>
+          <div className="flex space-x-4">
             <Link
               href="/privacy-policy"
+              className="hover:text-primary transition"
               onClick={() => setIsOpen(false)}
-              className="text-sm"
             >
               Privacy Policy
             </Link>
             <Link
               href="/changelog"
+              className="hover:text-primary transition"
               onClick={() => setIsOpen(false)}
-              className="text-sm"
             >
-              Change Log
+              Changelog
             </Link>
-          </div>
+          </div>{" "}
         </div>
         <RGBBackground />
       </div>

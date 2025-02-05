@@ -1,17 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Menu from "@/components/Menu";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
+import localFont from "next/font/local";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const SkRegular = localFont({
+  src: "../../public/fonts/Sk-Modernist-Regular.otf", // Supports .otf
+  display: "swap",
+  variable: "--font-skregular", // Creates a CSS variable
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const SkBold = localFont({
+  src: "../../public/fonts/Sk-Modernist-Bold.otf", // Supports .otf
+  display: "swap",
+  variable: "--font-skbold", // Creates a CSS variable
+});
+
+const Skmono = localFont({
+  src: "../../public/fonts/Sk-Modernist-Mono.otf", // Supports .otf
+  display: "swap",
+  variable: "--font-skmono", // Creates a CSS variable
 });
 
 export const metadata: Metadata = {
@@ -27,12 +35,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${SkRegular.variable} ${SkBold.variable} ${Skmono.variable} antialiased`}
       >
-        <Header />
+        <ThemeSwitcher />
+        <Menu />
         {children}
       </body>
-      <Footer />
     </html>
   );
 }
