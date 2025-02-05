@@ -3,6 +3,7 @@ import "./globals.css";
 import Menu from "@/components/Menu";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import localFont from "next/font/local";
+import SmoothScrolling from "@/components/SmoothScrolling";
 
 const SkRegular = localFont({
   src: "../../public/fonts/Sk-Modernist-Regular.otf", // Supports .otf
@@ -35,11 +36,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${SkRegular.variable} ${SkBold.variable} ${Skmono.variable} antialiased`}
+        className={`${SkRegular.variable} ${SkBold.variable} ${Skmono.variable} antialiased min-h-100vh p-[10px]`}
       >
         <ThemeSwitcher />
         <Menu />
-        {children}
+        <SmoothScrolling>{children}</SmoothScrolling>
       </body>
     </html>
   );
