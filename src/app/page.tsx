@@ -24,14 +24,14 @@ export default function Home() {
 
   // Parallax Effects
   const parallaxText = useTransform(scrollYProgress, [0, 1], ["0%", "-24%"]);
-  const parallaxBg = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
+  const parallaxBg = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
   const parallaxHeading = useTransform(scrollYProgress, [0, 1], ["0%", "-15%"]);
 
   return (
     <div ref={scrollRef}>
       <main className="relative pointer-events-auto">
         <div style={{ transform: `translateY(${parallaxBg})` }}>
-          <section className="relative w-full min-h-[100vh] flex flex-col items-center justify-center text-center bg-background overflow-hidden">
+          <section className="relative top-48 w-full min-h-[100vh] flex flex-col items-center text-center bg-background overflow-hidden">
             <motion.h1
               style={{ y: parallaxHeading }}
               initial={{ opacity: 0, y: 50 }}
@@ -47,7 +47,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.5 }}
-              className="mt-2 text-regular text-md text-muted-foreground max-w-xl"
+              className="mt-2 text-regular text-sm text-muted-foreground max-w-xl"
             >
               Nothing is real, everything is simulation —
               <Link
@@ -66,7 +66,7 @@ export default function Home() {
                 sectionInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }
               }
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-xs font-regular w-[8.3vw] leading-[92%]"
+              className="text-xs font-regular w-[26.8vw] sm:w-[8.3vw] leading-[92%]"
             >
               Screen printing allows for vibrant colors and intricate patterns.
             </motion.h2>
@@ -85,9 +85,9 @@ export default function Home() {
                   hidden: { opacity: 0 },
                   visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
                 }}
-                className="absolute flex top-0 right-0 w-[82vw] z-10 "
+                className="absolute top-0 right-0 w-[62vw] sm:w-[82vw] z-10 "
               >
-                <h3 className="text-md md:text-[22.5px] leading-tight">
+                <h3 className="text-sm md:text-[22.5px] leading-tight">
                   It is the process of transforming creative ideas into actual
                   designs. That is a transformation in the dynamic world of
                   screen printing. Artists and designers draw inspiration from

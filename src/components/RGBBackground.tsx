@@ -16,25 +16,30 @@ const calculateRGBValues = (
   const yRatio = y / height;
 
   return {
-    red: Math.min(255, Math.abs(yRatio * 300)), // Increased brightness
-    green: Math.min(255, Math.abs((1 - yRatio) * 300)), // More contrast
-    blue: Math.min(255, Math.abs(xRatio * 300)), // Stronger blue intensity
+    red: Math.min(255, Math.abs(yRatio * 300)),
+    green: Math.min(255, Math.abs((1 - yRatio) * 300)),
+    blue: Math.min(255, Math.abs(xRatio * 300)),
   };
 };
 
 const RGBBackground = () => {
   const rgbRef = useRef<SVGSVGElement | null>(null);
   const latestPosition = useRef({ x: 0, y: 0 });
+  const windowSize = useRef({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const handleResize = () => {
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+      windowSize.current = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
     };
 
-    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -44,10 +49,10 @@ const RGBBackground = () => {
       calculateRGBValues(
         mousePosition.x,
         mousePosition.y,
-        windowSize.width,
-        windowSize.height,
+        windowSize.current.width,
+        windowSize.current.height,
       ),
-    [mousePosition, windowSize],
+    [mousePosition],
   );
 
   const throttledMouseMove = useMemo(
@@ -56,8 +61,8 @@ const RGBBackground = () => {
         setMousePosition({ x: event.clientX, y: event.clientY });
 
         if (rgbRef.current) {
-          const dx = (event.clientX - windowSize.width / 2) * 0.025;
-          const dy = (event.clientY - windowSize.height / 2) * 0.025;
+          const dx = (event.clientX - windowSize.current.width / 2) * 0.03;
+          const dy = (event.clientY - windowSize.current.height / 2) * 0.03;
 
           latestPosition.current.x = Math.max(
             -MAX_MOVEMENT,
@@ -76,9 +81,8 @@ const RGBBackground = () => {
           });
         }
       }, MOUSE_THROTTLE),
-    [windowSize],
+    [],
   );
-
   useEffect(() => {
     window.addEventListener("mousemove", throttledMouseMove);
     return () => window.removeEventListener("mousemove", throttledMouseMove);
@@ -89,12 +93,13 @@ const RGBBackground = () => {
       <svg
         ref={rgbRef}
         className="relative inset-0 w-full h-full"
-        viewBox="0 0 600 600"
+        viewBox="-50 -50 700 700"
         aria-hidden="true"
+        style={{ willChange: "transform" }}
       >
         <circle
           cx="150"
-          cy="200"
+          cy="250"
           r="250"
           fill={`rgb(${rgbValues.red}, 100, 100)`}
           opacity="0.7"
@@ -102,7 +107,7 @@ const RGBBackground = () => {
         />
         <circle
           cx="400"
-          cy="200"
+          cy="250"
           r="250"
           fill={`rgb(100, ${rgbValues.green}, 100)`}
           opacity="0.7"
@@ -110,7 +115,7 @@ const RGBBackground = () => {
         />
         <circle
           cx="275"
-          cy="350"
+          cy="400"
           r="250"
           fill={`rgb(100, 100, ${rgbValues.blue})`}
           opacity="0.7"

@@ -8,6 +8,7 @@ import { FaInstagram, FaGithub, FaYoutube } from "react-icons/fa";
 import { TbMenu } from "react-icons/tb";
 import Image from "next/image";
 import RGBBackground from "@/components/RGBBackground";
+import ThemeSwitcher from "./ThemeSwitcher";
 
 const socialLinks = [
   {
@@ -40,8 +41,12 @@ const menuSections = [
     title: "Services",
     items: [
       { name: "Price", link: "/service/price" },
-      { name: "Solid Process", link: "/services/solid-process" },
-      { name: "Request", link: "/services/request" },
+      { name: "Process CC", link: "/service/process-cc" },
+      {
+        name: "Request",
+        link: "https://forms.fillout.com/t/pFE4XxyiXGus",
+        isExternal: true,
+      },
       { name: "Product", link: "/product" },
     ],
   },
@@ -140,10 +145,16 @@ export default function Menu() {
 
   return (
     <>
+      <ThemeSwitcher />
+      <div className="sticky top-3 flex justify-center mx-auto text-xs z-10 mix-blend-difference text-white">
+        <Link href="/" className="hover:underline">
+          Simulasi Studio • Screen printing service
+        </Link>
+      </div>
       {!isOpen && (
         <button
           ref={menuButtonRef}
-          className="fixed top-4 right-4 z-40 flex items-center gap-2 text-lg cursor-pointer transition"
+          className="fixed top-2 right-2 z-40 flex items-center gap-2 text-lg cursor-pointer transition"
           onClick={() => setIsOpen(true)}
           onMouseEnter={() => handleHover(true)}
           onMouseLeave={() => handleHover(false)}
@@ -197,9 +208,20 @@ export default function Menu() {
                       }}
                       className="text-base sm:text-lg hover:text-primary transition-colors cursor-pointer"
                     >
-                      <Link href={item.link} onClick={() => setIsOpen(false)}>
-                        {item.name}
-                      </Link>
+                      {item.isExternal ? (
+                        <a
+                          href={item.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {item.name}
+                        </a>
+                      ) : (
+                        <Link href={item.link} onClick={() => setIsOpen(false)}>
+                          {item.name}
+                        </Link>
+                      )}
                     </li>
                   );
                 })}
@@ -244,7 +266,7 @@ export default function Menu() {
             >
               Changelog
             </Link>
-          </div>{" "}
+          </div>
         </div>
         <RGBBackground />
       </div>

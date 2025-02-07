@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Menu from "@/components/Menu";
-import ThemeSwitcher from "@/components/ThemeSwitcher";
 import localFont from "next/font/local";
 import SmoothScrolling from "@/components/SmoothScrolling";
 
@@ -38,7 +37,6 @@ export default function RootLayout({
       <body
         className={`${SkRegular.variable} ${SkBold.variable} ${Skmono.variable} antialiased min-h-100vh p-[10px]`}
       >
-        <ThemeSwitcher />
         <Menu />
         <SmoothScrolling>{children}</SmoothScrolling>
       </body>

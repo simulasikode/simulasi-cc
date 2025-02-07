@@ -78,6 +78,10 @@
   --primary: #adaa9f;
 }
 
+svg {
+  overflow: visible;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);

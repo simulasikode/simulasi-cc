@@ -90,7 +90,7 @@ export default function ThemeSwitcher() {
   };
 
   return (
-    <div className="fixed top-4 left-4 z-10">
+    <div className="fixed top-2 left-2 z-10">
       <button
         onClick={toggleTheme}
         className="hover:bg-opacity-80 transition-colors duration-200 cursor-pointer"
