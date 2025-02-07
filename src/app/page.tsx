@@ -1,5 +1,4 @@
 "use client";
-import { CaseStudies } from "@/components/CaseStudies";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
@@ -103,9 +102,6 @@ export default function Home() {
                 </h3>
               </motion.div>
             </div>
-          </section>
-          <section className="relative my-48">
-            <CaseStudies />
           </section>
         </div>
       </main>

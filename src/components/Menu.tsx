@@ -7,8 +7,15 @@ import { X } from "lucide-react";
 import { FaInstagram, FaGithub, FaYoutube } from "react-icons/fa";
 import { TbMenu } from "react-icons/tb";
 import Image from "next/image";
-import RGBBackground from "@/components/RGBBackground";
-import ThemeSwitcher from "./ThemeSwitcher";
+import dynamic from "next/dynamic";
+
+const RGBBackground = dynamic(() => import("@/components/RGBBackground"), {
+  ssr: false,
+});
+
+const ThemeSwitcher = dynamic(() => import("@/components/ThemeSwitcher"), {
+  ssr: false,
+});
 
 const socialLinks = [
   {
