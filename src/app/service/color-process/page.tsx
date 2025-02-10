@@ -1,25 +1,28 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import convert from "color-convert";
 import { FaInfoCircle, FaCalculator, FaSyncAlt } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { IoCheckmarkOutline, IoChevronDown } from "react-icons/io5";
 
 // Tailwind CSS Classes
-const containerClasses = "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
-const sectionClasses = "mb-8";
+const containerClasses = "relative w-[100vw]";
+const sectionClasses = "relative  m-16 flex flex-col  items-center ";
 const headingClasses =
-  "text-4xl sm:text-5xl lg:text-6xl font-extrabold mt-8 mb-4";
-const cardClasses = "border border-primary p-6";
-const labelClasses = "block text-sm font-bold text-foreground mb-1";
+  "text-4xl sm:text-5xl lg:text-[75px] uppercase leading-[82%] tracking-tighter font-bold -ml-[10px] pl-[10px]";
+const cardClasses = "p-8";
+const labelClasses = "block text-sm font-bold text-foreground mb-2";
 const inputClasses =
-  "focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-primary bg-gray-100 dark:bg-gray-900 py-2 px-3";
+  "focus:outline-none block w-full sm:text-sm border border-primary bg-gray-50 dark:bg-[#161616] py-[10px] px-4";
 const buttonClasses =
-  "bg-foreground hover:bg-primary text-background font-bold py-2 px-4  focus:outline-none";
-const gridClasses = "grid grid-cols-12 gap-6";
-const gridItemClasses = "col-span-12 md:col-span-5"; // Adjust based on desired layout
+  "bg-foreground hover:bg-primary text-background text-xs text-left px-4 py-4 w-full  focus:outline-none cursor-pointer";
+const gridClasses = "grid grid-cols-12 -ml-[10px] border-y border-primary";
+const gridItemClasses = "col-span-12 md:col-span-4"; // Adjust based on desired layout
 const colorBoxClasses = "w-full overflow-hidden relative";
 const colorValueClasses =
   "absolute bottom-0 left-0 right-0 backdrop-blur-sm p-4";
-const resultsClasses = "pt-4 border-t border-primary";
+const resultsClasses = "pt-4 ";
 
 const ICC_PROFILES = [
   { name: "sRGB", path: "/icc/sRGB_v4_ICC_preference.icc" },
@@ -91,10 +94,8 @@ const useColorManagement = () => {
     try {
       setIsLoading(true);
 
-      // Pass c, m, y, and k as separate arguments
       const [r, g, b] = convert.cmyk.rgb(c, m, y, k);
 
-      // Apply profile-specific adjustments
       const adjustedRGB = applyProfileAdjustment(r, g, b, profile);
 
       return {
@@ -103,13 +104,15 @@ const useColorManagement = () => {
         b: Math.round(adjustedRGB.b),
       };
     } catch (error: unknown) {
+      // Use 'any' here or provide a more specific type
       console.error("Color conversion error:", error);
 
-      // Check if the error is an instance of Error before accessing its message
-      if (error instanceof Error) {
-        console.error("Error message:", error.message);
+      if (typeof error === "object" && error !== null && "message" in error) {
+        console.error("Error message:", (error as { message: string }).message); // Type assertion
+      } else {
+        console.error("Unknown error type:", error);
       }
-
+      //Fallback to Basic Conversion
       return basicCMYKtoRGB(c, m, y, k);
     } finally {
       setIsLoading(false);
@@ -184,9 +187,9 @@ const useColorSpaceConversion = () => {
 
 const useHsbToCmyk = () => {
   const convertHsbToCmyk = (h: number, s: number, b: number): CMYK => {
-    const [r, g, b_] = convert.hsv.rgb(h, s / 100, b / 100);
+    const [r, g, blue] = convert.hsv.rgb(h, s, b);
     //const rgb: number[] = convert.hsv.rgb(h, s, b); //color-convert will return an array
-    const cmyk = convert.rgb.cmyk(r, g, b_);
+    const cmyk = convert.rgb.cmyk(r, g, blue);
     //const cmyk: number[] = convert.rgb.cmyk(rgb); //color-convert will return an array
 
     return {
@@ -220,23 +223,44 @@ const ColorCalculator = () => {
     cmyk: { c: 0, m: 0, y: 0, k: 0 },
   });
 
-  const [results, setResults] = useState({
-    Cyan: 0,
-    Magenta: 0,
-    Yellow: 0,
-    Black: 0,
-    Medium: 0,
-    Retarder: 0,
-    TotalWeight: 0,
-  });
+  type ResultItem = { label: string; value: number }; // Type alias
+  const [results, setResults] = useState<ResultItem[]>([
+    { label: "Cyan", value: 0 },
+    { label: "Magenta", value: 0 },
+    { label: "Yellow", value: 0 },
+    { label: "Black", value: 0 },
+    { label: "Medium", value: 0 },
+    { label: "Retarder", value: 0 },
+    { label: "TotalWeight", value: 0 },
+  ]);
 
-  // Implement better toast handling (replace with actual toast library integration)
+  const toastFunctions = {
+    success: toast.success,
+    error: toast.error,
+    info: toast.info,
+    warning: toast.warning,
+    dark: toast.dark,
+  } as const;
+
+  type ToastFunctionKey = keyof typeof toastFunctions;
+  type ToastFunction = (typeof toastFunctions)[ToastFunctionKey];
+
   const showToast = (
     title: string,
     description: string,
-    status: string,
+    status: ToastFunctionKey,
   ): void => {
-    alert(`${title}: ${description} (${status})`);
+    const toastFunction: ToastFunction = toastFunctions[status];
+
+    toastFunction(`${title}: ${description}`, {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
 
   useEffect(() => {
@@ -365,17 +389,17 @@ const ColorCalculator = () => {
     }
 
     const totalColor = cyan + magenta + yellow + black;
-    const retarder = totalColor * 0.3;
+    const retarder = totalColor * 0.15;
 
-    const weights = {
-      Cyan: (cyan / totalInput) * 100,
-      Magenta: (magenta / totalInput) * 100,
-      Yellow: (yellow / totalInput) * 100,
-      Black: (black / totalInput) * 100,
-      Medium: (medium / totalInput) * 100,
-      Retarder: retarder,
-      TotalWeight: totalInput,
-    };
+    const weights = [
+      { label: "Cyan", value: (cyan / totalInput) * 100 },
+      { label: "Magenta", value: (magenta / totalInput) * 100 },
+      { label: "Yellow", value: (yellow / totalInput) * 100 },
+      { label: "Black", value: (black / totalInput) * 100 },
+      { label: "Medium", value: (medium / totalInput) * 100 },
+      { label: "Retarder", value: retarder },
+      { label: "TotalWeight", value: totalInput },
+    ];
 
     setResults(weights);
     showToast(
@@ -385,10 +409,119 @@ const ColorCalculator = () => {
     );
   };
 
+  interface Profile {
+    name: string;
+    path: string;
+  }
+
+  interface CustomSelectProps {
+    options: Profile[];
+    selectedProfile: string;
+    setSelectedProfile: (profileName: string) => void;
+  }
+
+  const CustomSelect: React.FC<CustomSelectProps> = ({
+    options,
+    selectedProfile,
+    setSelectedProfile,
+  }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const selectRef = useRef<HTMLDivElement>(null); // Correct: Initial value is null
+
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          selectRef.current &&
+          !selectRef.current.contains(event.target as Node)
+        ) {
+          // Clicked outside the select
+          setIsOpen(false);
+        }
+      };
+
+      if (isOpen) {
+        document.addEventListener("mousedown", handleClickOutside);
+      }
+
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [isOpen]);
+
+    return (
+      <div className="relative w-full" ref={selectRef}>
+        <button
+          type="button"
+          className="flex items-center justify-between w-full px-4 py-2 border border-primary bg-gray-50 dark:bg-[#161616] text-left cursor-pointer"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {selectedProfile}
+          <span>
+            <IoChevronDown size={16} />
+          </span>{" "}
+          {/* Down arrow */}
+        </button>
+        {isOpen && (
+          <div className="absolute left-0 right-0 bg-background dark:bg-[#161616] border border-primary">
+            {options.map((profile) => (
+              <CustomOption
+                key={profile.path}
+                profile={profile}
+                selectedProfile={selectedProfile}
+                setSelectedProfile={setSelectedProfile}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  interface CustomOptionProps {
+    profile: Profile;
+    selectedProfile: string;
+    setSelectedProfile: (profileName: string) => void;
+  }
+
+  const CustomOption: React.FC<CustomOptionProps> = ({
+    profile,
+    selectedProfile,
+    setSelectedProfile,
+  }) => {
+    const isSelected = profile.name === selectedProfile;
+    return (
+      <div
+        className={`flex items-center justify-between px-4 py-2 cursor-pointer hover:opacity-60 dark:hover:bg-[#161616] ${
+          isSelected ? "bg-background dark:bg-[#161616]" : ""
+        }`}
+        onClick={() => setSelectedProfile(profile.name)}
+      >
+        <span>{profile.name}</span>
+        {isSelected && (
+          <span className="text-foreground">
+            <IoCheckmarkOutline />{" "}
+          </span>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={containerClasses}>
       <div className={sectionClasses}>
-        <h1 className={headingClasses}>Process Color Calculator</h1>
+        <h1 className={headingClasses}>The Color Process</h1>
+        <p className="text-[22.5px] uppercase m-4 max-w-2xl leading-[82%] text-center">
+          Digital tools are designed to simplify the complex process of color
+          mixing and conversion.
+        </p>
+        <p className="text-sm text-center max-w-lg">
+          These tools allow users to input color values from various models,
+          such as CMYK and HSB. The ICC color profiles ensure accuracy across
+          different devices and media. In addition to basic color conversion,
+          these tools include a mixing calculator that enables users to specify
+          desired colors and mixing ratios. This feature helps achieve precise
+          color formulations for printing and other applications.
+        </p>
       </div>
 
       <div className={gridClasses}>
@@ -400,74 +533,62 @@ const ColorCalculator = () => {
                 style={{ backgroundColor: colorValues.hex }}
               ></div>
               <div className={colorValueClasses}>
-                <p className="font-semibold text-lg">
+                <p className="font-semibold text-lg dark:text-gray-900">
                   {colorValues.hex.toUpperCase()}
                 </p>
               </div>
             </div>
 
-            <div className="p-4">
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                <div>
-                  <p className={labelClasses}>RGB</p>
-                  <div>
-                    <p className="text-sm">R: {colorValues.rgb.r}</p>
-                    <p className="text-sm">G: {colorValues.rgb.g}</p>
-                    <p className="text-sm">B: {colorValues.rgb.b}</p>
-                  </div>
-                </div>
-                <div>
-                  <p className={labelClasses}>HSB</p>
-                  <div>
-                    <p className="text-sm">H: {hue}°</p>
-                    <p className="text-sm">S: {saturation}%</p>
-                    <p className="text-sm">B: {brightness}%</p>
-                  </div>
-                </div>
-                <div>
-                  <p className={labelClasses}>CMYK</p>
-                  <div>
-                    <p className="text-sm">C: {cyan}%</p>
-                    <p className="text-sm">M: {magenta}%</p>
-                    <p className="text-sm">Y: {yellow}%</p>
-                    <p className="text-sm">K: {black}%</p>
-                  </div>
-                </div>
-              </div>
-
-              {results && (
+            <div>
+              {results && Array.isArray(results) && (
                 <div className={resultsClasses}>
                   <p className="mb-2 font-bold">Results</p>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    {/* Mapping Colors */}
                     <div>
-                      <p className={labelClasses}>Components</p>
+                      <p className={labelClasses}>Colors</p>
                       <div>
-                        <p className="text-sm">
-                          Cyan: {results.Cyan.toFixed(1)} grams
-                        </p>
-                        <p className="text-sm">
-                          Magenta: {results.Magenta.toFixed(1)} grams
-                        </p>
-                        <p className="text-sm">
-                          Yellow: {results.Yellow.toFixed(1)} grams
-                        </p>
-                        <p className="text-sm">
-                          Black: {results.Black.toFixed(1)} grams
-                        </p>
+                        {results
+                          .filter((r: ResultItem) =>
+                            ["Cyan", "Magenta", "Yellow", "Black"].includes(
+                              r.label,
+                            ),
+                          )
+                          .map((result: ResultItem) => (
+                            <div
+                              className="text-sm flex justify-between align-baseline mb-2 pb-2 border-b border-primary"
+                              key={result.label}
+                            >
+                              <p>{result.label}</p>{" "}
+                              <span>{result.value.toFixed(1)} grams</span>
+                            </div>
+                          ))}
                       </div>
                     </div>
+
+                    {/* Mapping Medium */}
                     <div>
-                      <p className={labelClasses}>Additives</p>
+                      <p className={labelClasses}>Medium</p>
                       <div>
-                        <p className="text-sm">
-                          Medium: {results.Medium.toFixed(1)} grams
-                        </p>
-                        <p className="text-sm">
-                          Retarder: {results.Retarder.toFixed(1)} grams
-                        </p>
-                        <p className="text-sm font-medium mt-1">
-                          Total: {results.TotalWeight.toFixed(1)} grams
-                        </p>
+                        {results
+                          .filter((r: ResultItem) =>
+                            ["Medium", "Retarder", "TotalWeight"].includes(
+                              r.label,
+                            ),
+                          )
+                          .map((result: ResultItem) => (
+                            <div
+                              className={`text-sm justify-between flex border-b border-primary mb-2 pb-2${
+                                result.label === "TotalWeight"
+                                  ? "font-bold mb-2 pb-2"
+                                  : ""
+                              }`}
+                              key={result.label}
+                            >
+                              <p>{result.label}</p>{" "}
+                              <span>{result.value.toFixed(1)} grams</span>
+                            </div>
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -476,7 +597,7 @@ const ColorCalculator = () => {
             </div>
           </div>
 
-          <div className="pt-4">
+          <div className="px-8 py-6">
             <div className="flex space-x-4">
               <button className={buttonClasses} onClick={handleReset}>
                 <FaInfoCircle className="inline-block mr-2" />
@@ -490,34 +611,27 @@ const ColorCalculator = () => {
           </div>
         </div>
 
-        <div className="col-span-12 md:col-span-7">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="col-span-12 md:col-span-4 border-x border-primary">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
             <div className={cardClasses}>
-              <h2 className="text-lg font-semibold mb-4">ICC Profile</h2>
+              <h2 className="text-lg font-bold mb-2">ICC Profile</h2>
               <div>
                 <label htmlFor="profile" className={labelClasses}>
                   Select Color Profile:
                 </label>
-                <select
-                  id="profile"
-                  className={inputClasses}
-                  value={selectedProfile}
-                  onChange={(e) => setSelectedProfile(e.target.value)}
-                >
-                  {ICC_PROFILES.map((profile) => (
-                    <option key={profile.path} value={profile.name}>
-                      {profile.name}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-gray-500 text-sm mt-2">
+                <CustomSelect
+                  options={ICC_PROFILES}
+                  selectedProfile={selectedProfile}
+                  setSelectedProfile={setSelectedProfile}
+                />
+                <p className="text-gray-500 text-xs mb-2 mt-2">
                   Select color profile for conversion
                 </p>
               </div>
             </div>
 
             <div className={cardClasses}>
-              <h2 className="text-lg font-semibold mb-4">Medium</h2>
+              <h2 className="text-lg font-semibold mb-2">Medium</h2>
               <div>
                 <label htmlFor="medium" className={labelClasses}>
                   Medium:
@@ -530,21 +644,94 @@ const ColorCalculator = () => {
                     value={medium}
                     min={0}
                     max={100}
-                    step={0.1}
+                    step={1}
                     onChange={(e) =>
                       handleMediumChange(e.target.value, setMedium)
                     }
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500">%</span>
+                    <span className="text-gray-500 mr-6">%</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <div className={cardClasses + " mt-6"}>
-            <h2 className="text-lg font-semibold mb-4">HSB Color</h2>
+          <div className="col-span-12 md:col-span-4 border-t border-primary mt-2">
+            <div className={cardClasses}>
+              <h2 className="text-lg font-semibold mb-6">CMYK Input</h2>
+              <div className="space-y-5">
+                {[
+                  { label: "Cyan", value: cyan, setter: setCyan },
+                  { label: "Magenta", value: magenta, setter: setMagenta },
+                  { label: "Yellow", value: yellow, setter: setYellow },
+                  { label: "Black", value: black, setter: setBlack },
+                ].map(({ label, value, setter }) => (
+                  <div key={label}>
+                    <label
+                      htmlFor={label.toLowerCase()}
+                      className={labelClasses}
+                    >
+                      {label}:
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        id={label.toLowerCase()}
+                        className={inputClasses}
+                        value={value}
+                        min={0}
+                        max={100}
+                        step={1}
+                        onChange={(e) => {
+                          const newValue = Math.min(
+                            Math.max(parseFloat(e.target.value) || 0, 0),
+                            100,
+                          );
+                          setter(newValue);
+                        }}
+                      />
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <span className="text-gray-500 mr-6">%</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-span-12 md:col-span-4">
+          <div className={cardClasses}>
+            <h2 className="text-lg font-semibold mb-2">HSB Input</h2>
+            <p className="text-sm mb-10">
+              The HSB model, which stands for Hue, Saturation, and Brightness,
+              describes colors based on three parameters: hue (the dominant
+              color), saturation (the intensity or purity of the color), and
+              brightness (how light or dark the color is). This model provides a
+              more intuitive way to understand color for many people, as it
+              closely aligns with human perception of color.{" "}
+            </p>
+            <div className="w-full mt-2">
+              <div
+                className="relative h-5 cursor-pointer mb-4"
+                style={{
+                  background:
+                    "linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red)",
+                }}
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const percentage = x / rect.width;
+                  const newHue = Math.round(percentage * 360);
+                  handleHueChange(Math.min(360, Math.max(0, newHue)));
+                }}
+              >
+                <div
+                  className="absolute left-0 top-[-2px] w-6 h-6 bg-white rounded-full border border-primary transform -translate-x-1/2"
+                  style={{ left: `${(hue / 360) * 100}%` }}
+                />
+              </div>
+            </div>
             <div className="space-y-4">
               {[
                 {
@@ -581,7 +768,7 @@ const ColorCalculator = () => {
                       value={value}
                       min={0}
                       max={max}
-                      step={label === "Hue" ? 1 : 0.1}
+                      step={label === "Hue" ? 1 : 1}
                       onChange={(e) => {
                         const newValue = Math.min(
                           Math.max(parseFloat(e.target.value) || 0, 0),
@@ -592,84 +779,21 @@ const ColorCalculator = () => {
                       }}
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500">{unit}</span>
+                      <span className="text-gray-500 mr-6">{unit}</span>
                     </div>
                   </div>
                 </div>
               ))}
 
-              <div className="w-full mt-2">
-                <div
-                  className="relative h-5 cursor-pointer"
-                  style={{
-                    background:
-                      "linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red)",
-                  }}
-                  onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const percentage = x / rect.width;
-                    const newHue = Math.round(percentage * 360);
-                    handleHueChange(Math.min(360, Math.max(0, newHue)));
-                  }}
-                >
-                  <div
-                    className="absolute left-0 top-[-2px] w-6 h-6 bg-white rounded-full border border-primary transform -translate-x-1/2"
-                    style={{ left: `${(hue / 360) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              <button
-                className={buttonClasses + " w-xs mt-4"}
-                onClick={handleHsbCorrection}
-              >
+              <button className={buttonClasses} onClick={handleHsbCorrection}>
                 <FaSyncAlt className="inline-block mr-2" />
                 Update from HSB
               </button>
             </div>
           </div>
-
-          <div className={cardClasses + " mt-6"}>
-            <h2 className="text-lg font-semibold mb-4">CMYK Color</h2>
-            <div className="space-y-4">
-              {[
-                { label: "Cyan", value: cyan, setter: setCyan },
-                { label: "Magenta", value: magenta, setter: setMagenta },
-                { label: "Yellow", value: yellow, setter: setYellow },
-                { label: "Black", value: black, setter: setBlack },
-              ].map(({ label, value, setter }) => (
-                <div key={label}>
-                  <label htmlFor={label.toLowerCase()} className={labelClasses}>
-                    {label}:
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      id={label.toLowerCase()}
-                      className={inputClasses}
-                      value={value}
-                      min={0}
-                      max={100}
-                      step={0.1}
-                      onChange={(e) => {
-                        const newValue = Math.min(
-                          Math.max(parseFloat(e.target.value) || 0, 0),
-                          100,
-                        );
-                        setter(newValue);
-                      }}
-                    />
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500">%</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

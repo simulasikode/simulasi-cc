@@ -22,6 +22,10 @@
 }
 
 :root {
+  --scrollbar-width: 10px;
+  --scrollbar-bg-track: #f1f1f1;
+  --scrollbar-bg-thumb: #888;
+  --scrollbar-bg-thumb-hover: #555;
   --background: #f7f3e3;
   --foreground: #191919;
   --primary: #5e5e5e;

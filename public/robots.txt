@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://simulasi.studio.
+
+# Sitemaps
+Sitemap: https://simulasi.studio./sitemap.xml

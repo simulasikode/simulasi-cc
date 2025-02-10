@@ -5,14 +5,17 @@ import { useRef } from "react";
 import { useInView } from "react-intersection-observer";
 
 export default function Home() {
-  const { ref: sectionRef, inView: sectionInView } = useInView({
+  // Configuration for Intersection Observers (DRY principle)
+  const inViewOptions = {
     triggerOnce: true,
-    threshold: 0.2,
-  });
+    threshold: 0.2, // Adjust as needed
+  };
+
+  const { ref: sectionRef, inView: sectionInView } = useInView(inViewOptions);
   const { ref: textRef, inView: textInView } = useInView({
-    triggerOnce: true,
+    ...inViewOptions,
     threshold: 0.3,
-  });
+  }); // Different threshold for text
 
   // Ref for tracking scroll
   const scrollRef = useRef(null);
@@ -21,10 +24,22 @@ export default function Home() {
     offset: ["start start", "end end"],
   });
 
-  // Parallax Effects
-  const parallaxText = useTransform(scrollYProgress, [0, 1], ["0%", "-24%"]);
+  // Parallax Effects (Consider extracting to a separate object or function)
+  const parallaxText = useTransform(scrollYProgress, [0, 1], ["0%", "-36%"]);
   const parallaxBg = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
-  const parallaxHeading = useTransform(scrollYProgress, [0, 1], ["0%", "-15%"]);
+  const parallaxHeadingY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["0%", "-15%"],
+  ); // Separate Y translation
+  const parallaxHeadingOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]); // Fade Out
+
+  // Animation Variants (Centralize for reusability and clarity)
+  const fadeInVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, delay: 0.3 } }, //Unified transition
+  };
+  const fadeInVariantsOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
   return (
     <div ref={scrollRef}>
@@ -32,19 +47,21 @@ export default function Home() {
         <div style={{ transform: `translateY(${parallaxBg})` }}>
           <section className="relative top-48 w-full min-h-[100vh] flex flex-col items-center text-center bg-background overflow-hidden">
             <motion.h1
-              style={{ y: parallaxHeading }}
+              style={{ y: parallaxHeadingY, opacity: parallaxHeadingOpacity }} // Apply opacity here
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, staggerChildren: 0.4 }}
-              className="text-3xl sm:text-[65px] leading-[82%] tracking-tighter font-bold"
+              className="text-3xl sm:text-[75px] leading-[82%] tracking-tighter font-bold"
             >
               MANIFESTING YOUR VISION
               <br />
               <span className="text-primary">INTO VIVID EXPRESSION</span>
             </motion.h1>
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              style={{ opacity: fadeInVariantsOpacity }}
+              variants={{ fadeInVariants }}
+              initial="hidden"
+              animate="visible"
               transition={{ duration: 1, delay: 0.5 }}
               className="mt-2 text-regular text-sm text-muted-foreground max-w-xl"
             >
@@ -60,19 +77,19 @@ export default function Home() {
           </section>
           <div className="sticky bottom-6 left-0 pointer-event">
             <motion.h2
-              initial={{ opacity: 0, x: -30 }}
-              animate={
-                sectionInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }
-              }
-              transition={{ duration: 0.8, delay: 0.3 }}
+              variants={fadeInVariants}
+              initial="hidden"
+              animate={sectionInView ? "visible" : "hidden"}
+              transition={{ duration: 0.8, delay: 0.3 }} //Removed redundant transition property, it's defined in variants
               className="text-xs font-regular w-[26.8vw] sm:w-[8.3vw] leading-[92%]"
             >
-              Screen printing allows for vibrant colors and intricate patterns.
+              screen printing techniques to discover the joy of achievable
+              artistic surprises.
             </motion.h2>
           </div>
           <section
             ref={sectionRef}
-            className="flex flex-col justify-between items-center"
+            className="flex flex-col justify-between items-center min-h-[20vh]"
           >
             <div className="relative w-full ">
               <motion.div
