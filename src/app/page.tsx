@@ -3,7 +3,7 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { useInView } from "react-intersection-observer";
-import { CaseStudies } from "@/components/CaseStudies";
+import CaseStudies from "@/components/CaseStudies";
 
 // Custom hook for intersection observer
 const useSectionInView = (threshold = 0.2) => {
@@ -97,7 +97,7 @@ const TextSection = () => {
       ref={textSectionRef}
       className="flex flex-col justify-between items-center min-h-[38vh] px-4 md:px-8 lg:px-16"
     >
-      <div className="relative w-full ">
+      <div className="relative w-full">
         {/* Responsive Width */}
         <motion.div
           ref={textRef}

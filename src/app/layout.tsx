@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+"use client";
 import "./globals.css";
 import Menu from "@/components/Menu";
 import localFont from "next/font/local";
@@ -6,67 +6,40 @@ import SmoothScrolling from "@/components/SmoothScrolling";
 import { GoogleTagManager } from "@next/third-parties/google";
 import GoogleAnalytics from "@/utils/GoogleAnalytics";
 import Footer from "@/components/Footer";
+import { AnimatePresence, motion } from "framer-motion";
+import { usePathname } from "next/navigation";
+import MetadataComponent from "@/components/MetadataComponent";
 
 const SkRegular = localFont({
-  src: "../../public/fonts/Sk-Modernist-Regular.otf", // Supports .otf
+  src: "../../public/fonts/Sk-Modernist-Regular.otf",
   display: "swap",
-  variable: "--font-skregular", // Creates a CSS variable
+  variable: "--font-skregular",
 });
 
 const SkBold = localFont({
-  src: "../../public/fonts/Sk-Modernist-Bold.otf", // Supports .otf
+  src: "../../public/fonts/Sk-Modernist-Bold.otf",
   display: "swap",
-  variable: "--font-skbold", // Creates a CSS variable
+  variable: "--font-skbold",
 });
 
 const Skmono = localFont({
-  src: "../../public/fonts/Sk-Modernist-Mono.otf", // Supports .otf
+  src: "../../public/fonts/Sk-Modernist-Mono.otf",
   display: "swap",
-  variable: "--font-skmono", // Creates a CSS variable
+  variable: "--font-skmono",
 });
-
-export const metadata: Metadata = {
-  title: "Simulasi Studio",
-  description:
-    "Screen printing studio base on Yogyakarta, Indonesia. We offer hand-pulled screen printing on paper using water-based ink.",
-  keywords: [
-    "screen printing",
-    "custom printing",
-    "fine art",
-    "Poster",
-    "local screen printing",
-    "Sablon Indonesia",
-    "Sablon kertas",
-    "art printing",
-    "CMYK",
-    "RGB",
-    "COlor",
-    "Paper",
-  ],
-  openGraph: {
-    title: "Simulasi Studio Fine Art Printing", // Same as title or slightly different
-    description:
-      "Screen printing studio base on Yogyakarta, Indonesia. We offer hand-pulled screen printing on paper using water-based ink.", // Same as description or slightly different
-    url: "https://simulasi.studio", // Replace with your website URL
-    type: "website", // Usually "website" for a business
-    images: [
-      {
-        url: "https://simulasi.studio/images/papersize.svg", // Replace with your Open Graph image URL
-        alt: "Paper Size Chart", // Alt text for the image
-        width: 1200, // Recommended width
-        height: 630, // Recommended height
-      },
-    ],
-  },
-};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <MetadataComponent />
+      </head>
       <GoogleAnalytics />
       <body
         className={`${SkRegular.variable} ${SkBold.variable} ${Skmono.variable} antialiased min-h-[100vh] p-[10px]`}
@@ -74,8 +47,17 @@ export default function RootLayout({
         <GoogleTagManager gtmId="GTM-PBBJ4ZFZ" />
 
         <Menu />
-
-        <SmoothScrolling>{children}</SmoothScrolling>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <SmoothScrolling>{children}</SmoothScrolling>
+          </motion.div>
+        </AnimatePresence>
         <Footer />
       </body>
     </html>
