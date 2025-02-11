@@ -75,6 +75,7 @@ export default function Menu() {
   const socialIconsRef = useRef<(HTMLAnchorElement | null)[]>([]);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuTextRef = useRef<HTMLSpanElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null); // Ref for close button
 
   useGSAP(() => {
     gsap.set(menuTextRef.current, { opacity: 0, x: -10 });
@@ -89,7 +90,6 @@ export default function Menu() {
     });
   };
 
-  // Automatically hide "Menu" text when menu closes
   useEffect(() => {
     if (!isOpen) {
       gsap.to(menuTextRef.current, {
@@ -98,6 +98,14 @@ export default function Menu() {
         duration: 0.3,
         ease: "power2.out",
       });
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      closeButtonRef.current?.focus(); // Focus on close button
+    } else {
+      menuButtonRef.current?.focus();
     }
   }, [isOpen]);
 
@@ -182,9 +190,11 @@ export default function Menu() {
         onClick={(e) => e.stopPropagation()}
       >
         <button
+          ref={closeButtonRef} // Assign ref to close button
           className="absolute top-2 right-2 text-foreground hover:text-primary transition cursor-pointer"
           onClick={() => setIsOpen(false)}
           aria-label="Close menu"
+          tabIndex={0}
         >
           <X size={32} />
         </button>
@@ -214,6 +224,7 @@ export default function Menu() {
                         if (el) menuItemsRef.current[refIndex] = el;
                       }}
                       className="text-base sm:text-lg hover:text-primary transition-colors cursor-pointer"
+                      tabIndex={0}
                     >
                       {item.isExternal ? (
                         <a
@@ -248,6 +259,7 @@ export default function Menu() {
               ref={(el) => {
                 if (el) socialIconsRef.current[index] = el;
               }}
+              tabIndex={0}
             >
               {social.icon}
             </a>
@@ -263,6 +275,7 @@ export default function Menu() {
               href="/privacy-policy"
               className="hover:text-primary transition"
               onClick={() => setIsOpen(false)}
+              tabIndex={0}
             >
               Privacy Policy
             </Link>
@@ -270,6 +283,7 @@ export default function Menu() {
               href="/changelog"
               className="hover:text-primary transition"
               onClick={() => setIsOpen(false)}
+              tabIndex={0}
             >
               Changelog
             </Link>

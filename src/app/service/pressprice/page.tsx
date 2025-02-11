@@ -102,14 +102,14 @@ const ScreenPrintingCalculator = () => {
 
   return (
     <div className="mt-16">
-      <div className="relative mb-16 flex flex-col items-center">
-        <h1 className="text-5xl md:text-[75px] font-bold text-center mb-2 uppercase  leading-[82%] tracking-tighter">
+      <div className="relative mx-auto mb-16 flex flex-col items-center">
+        <h1 className="relative text-5xl md:text-[75px] font-bold text-center mb-2 uppercase leading-[82%] tracking-tighter">
           PressPrice
         </h1>
-        <p className="text-[22.5px] uppercase m-2">
+        <p className="text-[22.5px] text-center uppercase m-2 leading-[82%]">
           easily estimate the costs of the screen printing projects
         </p>
-        <p className="text-sm text-center max-w-lg">
+        <p className="text-sm text-center max-w-lg leading-[92%]">
           The Screen Printing Calculator is a user-friendly tool designed to
           estimate the costs associated with hand-pulled screen printing on
           paper. It offers real-time price calculations based on user-defined

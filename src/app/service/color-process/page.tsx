@@ -10,7 +10,7 @@ import { IoCheckmarkOutline, IoChevronDown } from "react-icons/io5";
 const containerClasses = "relative w-[100vw]";
 const sectionClasses = "relative  m-16 flex flex-col  items-center ";
 const headingClasses =
-  "text-4xl sm:text-5xl lg:text-[75px] uppercase leading-[82%] tracking-tighter font-bold -ml-[10px] pl-[10px]";
+  "text-4xl sm:text-5xl lg:text-[75px] text-center uppercase leading-[82%] tracking-tighter font-bold -ml-[10px] pl-[10px]";
 const cardClasses = "p-8";
 const labelClasses = "block text-sm font-bold text-foreground mb-2";
 const inputClasses =
@@ -514,7 +514,7 @@ const ColorCalculator = () => {
           Digital tools are designed to simplify the complex process of color
           mixing and conversion.
         </p>
-        <p className="text-sm text-center max-w-lg">
+        <p className="text-sm text-center max-w-lg leading-[92%]">
           These tools allow users to input color values from various models,
           such as CMYK and HSB. The ICC color profiles ensure accuracy across
           different devices and media. In addition to basic color conversion,

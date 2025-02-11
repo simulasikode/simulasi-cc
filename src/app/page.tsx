@@ -3,124 +3,162 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { useInView } from "react-intersection-observer";
+import { CaseStudies } from "@/components/CaseStudies";
 
-export default function Home() {
-  // Configuration for Intersection Observers (DRY principle)
-  const inViewOptions = {
+// Custom hook for intersection observer
+const useSectionInView = (threshold = 0.2) => {
+  const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.2, // Adjust as needed
-  };
+    threshold,
+  });
+  return { ref, inView };
+};
 
-  const { ref: sectionRef, inView: sectionInView } = useInView(inViewOptions);
-  const { ref: textRef, inView: textInView } = useInView({
-    ...inViewOptions,
-    threshold: 0.3,
-  }); // Different threshold for text
-
-  // Ref for tracking scroll
-  const scrollRef = useRef(null);
+// Custom hook for parallax effect (now self-contained)
+const useParallax = (inputRange = [0, 1], outputRange = ["0%", "-10%"]) => {
+  const ref = useRef(null);
   const { scrollYProgress } = useScroll({
-    target: scrollRef,
+    target: ref,
     offset: ["start start", "end end"],
   });
+  const parallaxValue = useTransform(scrollYProgress, inputRange, outputRange);
 
-  // Parallax Effects (Consider extracting to a separate object or function)
-  const parallaxText = useTransform(scrollYProgress, [0, 1], ["0%", "-36%"]);
-  const parallaxBg = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
-  const parallaxHeadingY = useTransform(
-    scrollYProgress,
+  return { ref, parallaxValue };
+};
+
+// Reusable Hero Section Component
+const HeroSection = () => {
+  const { ref: heroRef, parallaxValue: parallaxHeadingY } = useParallax(
     [0, 1],
     ["0%", "-15%"],
-  ); // Separate Y translation
-  const parallaxHeadingOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]); // Fade Out
+  );
+  const { parallaxValue: parallaxHeadingOpacity } = useParallax(
+    [0, 0.5],
+    ["1", "0"],
+  ); // Change the output here
+  const { ref: parallaxRef, parallaxValue: parallaxBg } = useParallax();
 
-  // Animation Variants (Centralize for reusability and clarity)
+  return (
+    <div ref={parallaxRef} style={{ transform: `translateY(${parallaxBg})` }}>
+      <section className="relative top-48 w-full min-h-[100vh] flex flex-col items-center text-center bg-background overflow-hidden px-4 md:px-8 lg:px-16">
+        {/* Responsive Font Sizes */}
+        <motion.h1
+          ref={heroRef}
+          style={{ y: parallaxHeadingY, opacity: parallaxHeadingOpacity }}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, staggerChildren: 0.4 }}
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-[75px] leading-[82%] tracking-tighter font-bold"
+        >
+          MANIFESTING YOUR VISION
+          <br />
+          <span className="text-primary">INTO VIVID EXPRESSION</span>
+        </motion.h1>
+        <motion.p
+          style={{ opacity: parallaxHeadingOpacity }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="mt-2 text-regular text-sm text-muted-foreground max-w-xl"
+        >
+          Nothing is real, everything is simulation —
+          <Link
+            href="https://ifunny.co/picture/nothing-is-really-real-it-s-all-a-simulation-wAtezlS5C"
+            target="_blank"
+            className="hover:underline"
+          >
+            &quot;internet memes&quot;
+          </Link>
+        </motion.p>
+      </section>
+    </div>
+  );
+};
+
+// Reusable Text Section Component
+const TextSection = () => {
+  const { ref: textSectionRef, inView: textSectionInView } =
+    useSectionInView(0.3);
+  const { ref: textRef, parallaxValue: parallaxText } = useParallax(
+    [0, 1],
+    ["0%", "-36%"],
+  );
+
+  const fadeInVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.3, ease: "easeInOut" },
+    },
+  };
+
+  return (
+    <section
+      ref={textSectionRef}
+      className="flex flex-col justify-between items-center min-h-[38vh] px-4 md:px-8 lg:px-16"
+    >
+      <div className="relative w-full ">
+        {/* Responsive Width */}
+        <motion.div
+          ref={textRef}
+          style={{ y: parallaxText }}
+          initial="hidden"
+          animate={textSectionInView ? "visible" : "hidden"}
+          variants={fadeInVariants}
+          className="absolute top-0 right-0 w-[67vw] sm:w-[60vw] md:w-[72vw] lg:w-[50vw] xl:w-[78vw] z-10"
+        >
+          {/* Responsive Font Sizes */}
+          <h3 className="text-sm md:text-lg lg:text-xl leading-tight">
+            It is the process of transforming creative ideas into actual
+            designs. That is a transformation in the dynamic world of screen
+            printing. Artists and designers draw inspiration from their visions
+            and use screen printing techniques to realize these concepts. Screen
+            printing allows for vibrant colors and intricate patterns, allowing
+            for a clear representation of artistic expression. By carefully
+            selecting materials and applying various techniques, creators can
+            ensure that the original vision is communicated clearly and
+            effectively through each print. The synergy between the artistry and
+            tactile properties of paper enhances the overall experience, making
+            each piece a unique manifestation of creativity.{" "}
+          </h3>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default function Home() {
+  const { ref: scrollRef } = useSectionInView(0.1);
+  const { ref: screenPrintingTextRef, inView: screenPrintingTextInView } =
+    useSectionInView(0.4);
+
   const fadeInVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, delay: 0.3 } }, //Unified transition
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, delay: 0.3, ease: "easeInOut" },
+    },
   };
-  const fadeInVariantsOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
   return (
     <div ref={scrollRef}>
       <main className="relative pointer-events-auto">
-        <div style={{ transform: `translateY(${parallaxBg})` }}>
-          <section className="relative top-48 w-full min-h-[100vh] flex flex-col items-center text-center bg-background overflow-hidden">
-            <motion.h1
-              style={{ y: parallaxHeadingY, opacity: parallaxHeadingOpacity }} // Apply opacity here
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, staggerChildren: 0.4 }}
-              className="text-3xl sm:text-[75px] leading-[82%] tracking-tighter font-bold"
-            >
-              MANIFESTING YOUR VISION
-              <br />
-              <span className="text-primary">INTO VIVID EXPRESSION</span>
-            </motion.h1>
-            <motion.p
-              style={{ opacity: fadeInVariantsOpacity }}
-              variants={{ fadeInVariants }}
-              initial="hidden"
-              animate="visible"
-              transition={{ duration: 1, delay: 0.5 }}
-              className="mt-2 text-regular text-sm text-muted-foreground max-w-xl"
-            >
-              Nothing is real, everything is simulation —
-              <Link
-                href="https://ifunny.co/picture/nothing-is-really-real-it-s-all-a-simulation-wAtezlS5C"
-                target="_blank"
-                className="hover:underline"
-              >
-                &quot;internet memes&quot;
-              </Link>
-            </motion.p>
-          </section>
-          <div className="sticky bottom-6 left-0 pointer-event">
-            <motion.h2
-              variants={fadeInVariants}
-              initial="hidden"
-              animate={sectionInView ? "visible" : "hidden"}
-              transition={{ duration: 0.8, delay: 0.3 }} //Removed redundant transition property, it's defined in variants
-              className="text-xs font-regular w-[26.8vw] sm:w-[8.3vw] leading-[92%]"
-            >
-              screen printing techniques to discover the joy of achievable
-              artistic surprises.
-            </motion.h2>
-          </div>
-          <section
-            ref={sectionRef}
-            className="flex flex-col justify-between items-center min-h-[20vh]"
+        <HeroSection />
+        <div className="sticky bottom-6 left-0 pointer-event">
+          <motion.h2
+            ref={screenPrintingTextRef}
+            variants={fadeInVariants}
+            initial="hidden"
+            animate={screenPrintingTextInView ? "visible" : "hidden"}
+            className="text-xs font-regular w-[20.4vw] sm:w-[7.3vw] leading-[92%]"
           >
-            <div className="relative w-full ">
-              <motion.div
-                ref={textRef}
-                style={{ y: parallaxText }}
-                initial="hidden"
-                animate={textInView ? "visible" : "hidden"}
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
-                }}
-                className="absolute top-0 right-0 w-[62vw] sm:w-[82vw] z-10 "
-              >
-                <h3 className="text-sm md:text-[22.5px] leading-tight">
-                  It is the process of transforming creative ideas into actual
-                  designs. That is a transformation in the dynamic world of
-                  screen printing. Artists and designers draw inspiration from
-                  their visions and use screen printing techniques to realize
-                  these concepts. Screen printing allows for vibrant colors and
-                  intricate patterns, allowing for a clear representation of
-                  artistic expression. By carefully selecting materials and
-                  applying various techniques, creators can ensure that the
-                  original vision is communicated clearly and effectively
-                  through each print. The synergy between the artistry and
-                  tactile properties of paper enhances the overall experience,
-                  making each piece a unique manifestation of creativity.{" "}
-                </h3>
-              </motion.div>
-            </div>
-          </section>
+            screen printing techniques to discover the joy of achievable
+            artistic surprises.
+          </motion.h2>
         </div>
+        <TextSection />
+        <CaseStudies />
       </main>
     </div>
   );
