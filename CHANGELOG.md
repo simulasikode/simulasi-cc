@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.2](https://github.com/simulasikode/simulasi-cc/compare/v1.0.1...v1.0.2) (2025-02-11)
+
+
+### Bug Fixes
+
+* prerender ([51f9029](https://github.com/simulasikode/simulasi-cc/commit/51f9029c741d38444a53b8052fa077cd55d64675))
+
 ### [1.0.1](https://github.com/simulasikode/simulasi-cc/compare/v1.0.0...v1.0.1) (2025-02-07)
 
 ## 1.0.0 (2025-02-01)
