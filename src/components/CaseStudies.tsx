@@ -79,7 +79,7 @@ const CaseStudies: React.FC = () => {
       </div>
       <div className="absolute w-[calc(50vw-15px)] ml-[calc(50vw-5px)] mb-[150px]">
         <motion.h1
-          className="text-[90px] font-bold leading-[82%]"
+          className="text-[50px] sm:text-[60px] md:text-[70px] lg:text-[90px] font-bold leading-[82%]"
           variants={titleVariants}
           initial="hidden"
           animate={controls}
