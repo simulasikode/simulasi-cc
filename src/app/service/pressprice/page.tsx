@@ -1,4 +1,5 @@
 "use client";
+import { LucideArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { FaCalculator } from "react-icons/fa";
 
@@ -34,28 +35,54 @@ const EMULSION_PRICES_BY_COLOR_TIERS: Record<string, number> = {
 };
 
 const FIXED_COSTS = {
-  materialBasePrice: 83826,
+  materialBasePrice: 66213,
   production: 369262,
   overhead: 123090,
   labor: 7200,
 };
 
 const COLOR_PRICE = 23418;
-const MATERIAL_COLOR_SURCHARGE = 92500;
 const PROFIT_MARGIN_MULTIPLIER = 3.8;
 const MINIMUM_PRINT_RUN = 15;
+const MAXIMUM_PRINT_RUN = 100;
 
-// --- New Constants for Quantity Tiers and Discounts ---
+//Tiered Material Cost
+const MATERIAL_COST_TIERS: Record<string, number> = {
+  "1-2": 23418, // Material cost for 1-2 colors
+  "3-4": 71658, // Material cost for 3-4 colors
+  "5-6": 171978, // Material cost for 5-6 colors
+  "7-8": 313000, // Material cost for 7-8 colors
+  "9-10": 413160, // Material cost for 9-10 colors
+  "10+": 520000, // Material cost for 10 or more colors
+};
+
 const QUANTITY_TIERS: { threshold: number; fixedCostScale: number }[] = [
-  { threshold: 50, fixedCostScale: 1.0 },
-  { threshold: 100, fixedCostScale: 1.8 },
-  { threshold: 250, fixedCostScale: 2.2 },
-  { threshold: 500, fixedCostScale: 2.4 },
-  { threshold: Infinity, fixedCostScale: 2.6 },
+  { threshold: 15, fixedCostScale: 1.0 },
+  { threshold: 30, fixedCostScale: 1.2 },
+  { threshold: 45, fixedCostScale: 1.4 },
+  { threshold: 60, fixedCostScale: 1.6 },
+  { threshold: 75, fixedCostScale: 1.8 },
+  { threshold: 90, fixedCostScale: 2.0 },
+  { threshold: MAXIMUM_PRINT_RUN, fixedCostScale: 2.2 },
 ];
 
-const COLOR_PRICE_SCALE_THRESHOLD = 45; // Sheet count at which color price scaling starts
-const COLOR_PRICE_SCALE_FACTOR = 1.25; // Increase color price to 125%
+const COLOR_PRICE_SCALE_THRESHOLD = 25; // Sheet count at which color price scaling starts
+const COLOR_PRICE_SCALE_FACTOR = 1.16; // Increase color price to 125%
+
+// Tiered Pricing Constants
+const PRICE_PER_INCREMENT = 0.5; // 5% price increase per increment
+const INCREMENT_SIZE = 16; // Fixed at 15
+
+const BASE_INCREMENT = 0.11; // 11% base increment
+const PAPER_SIZE_PERCENT_INCREMENTS: Record<string, number> = {
+  B5: BASE_INCREMENT,
+  A4: BASE_INCREMENT,
+  B4: BASE_INCREMENT,
+  A3: BASE_INCREMENT,
+  B3: BASE_INCREMENT,
+  A2: BASE_INCREMENT,
+  Poster: BASE_INCREMENT,
+};
 
 // --- Helper Functions ---
 const formatCurrency = (value: number): string => {
@@ -68,8 +95,117 @@ const formatCurrency = (value: number): string => {
     }).format(value);
   } catch (error) {
     console.error("Currency formatting error:", error);
-    return "Rp. ???"; //Provide a graceful fallback
+    return "Rp. ???"; // Provide a graceful fallback
   }
+};
+
+const roundToNearestHundred = (value: number): number => {
+  return Math.round(value / 100) * 100;
+};
+
+// --- Helper Functions for Cost Calculation ---
+
+// Function to determine material cost based on color count tiers
+const getMaterialCost = (colorCount: number): number => {
+  let materialCost = 0;
+  const materialTier = Object.keys(MATERIAL_COST_TIERS).find((tier) => {
+    const [min, max] = tier.split("-").map(Number);
+    if (tier.includes("+")) {
+      return colorCount >= min;
+    }
+    return colorCount >= min && colorCount <= max;
+  });
+  materialCost = materialTier ? MATERIAL_COST_TIERS[materialTier] : 0;
+  return materialCost;
+};
+
+// Function to determine the fixed cost scale based on quantity tiers
+const getQuantityFixedCostScale = (totalPrint: number): number => {
+  const quantityTier =
+    QUANTITY_TIERS.find((tier) => totalPrint <= tier.threshold) ||
+    QUANTITY_TIERS[QUANTITY_TIERS.length - 1];
+  return quantityTier.fixedCostScale;
+};
+
+// Function to calculate scaled fixed costs
+const calculateFixedCosts = (
+  fixedCostScale: number,
+  materialCost: number,
+): number => {
+  const scaledProduction = FIXED_COSTS.production * fixedCostScale;
+  const scaledOverhead = FIXED_COSTS.overhead * fixedCostScale;
+  const scaledLabor = FIXED_COSTS.labor * fixedCostScale;
+  return materialCost + scaledProduction + scaledOverhead + scaledLabor;
+};
+
+// Function to calculate color cost, including scaling based on print quantity
+const calculateColorCost = (colorCount: number, totalPrint: number): number => {
+  let scaledColorPrice = COLOR_PRICE;
+  if (totalPrint > COLOR_PRICE_SCALE_THRESHOLD) {
+    scaledColorPrice = COLOR_PRICE * COLOR_PRICE_SCALE_FACTOR;
+  }
+  return scaledColorPrice * colorCount;
+};
+
+// Function to get emulsion cost based on color count tiers
+const getEmulsionCost = (colorCount: number): number => {
+  let emulsionCost = 0;
+  const emulsionTier = Object.keys(EMULSION_PRICES_BY_COLOR_TIERS).find(
+    (tier) => {
+      const [min, max] = tier.split("-").map(Number);
+      if (tier.includes("+")) {
+        return colorCount >= min;
+      }
+      return colorCount >= min && colorCount <= max;
+    },
+  );
+  emulsionCost = emulsionTier
+    ? EMULSION_PRICES_BY_COLOR_TIERS[emulsionTier]
+    : 0;
+  return emulsionCost;
+};
+
+// Function to calculate tiered price modifier based on total print quantity
+const calculateTieredPriceModifier = (totalPrint: number): number => {
+  const numberOfIncrements = Math.floor(totalPrint / INCREMENT_SIZE);
+  return numberOfIncrements * PRICE_PER_INCREMENT;
+};
+
+// Function to calculate paper size increment
+const calculatePaperSizeIncrement = (
+  baseFixedCosts: number,
+  paperSize: string,
+): number => {
+  const paperSizePercentIncrement =
+    PAPER_SIZE_PERCENT_INCREMENTS[paperSize] || 0;
+  return baseFixedCosts * paperSizePercentIncrement;
+};
+
+// Function to calculate total cost before profit margin and rounding
+const calculateTotalCostBeforeProfit = (
+  baseFixedCosts: number,
+  tieredPriceModifier: number,
+  paperSizeIncrement: number,
+): number => {
+  return baseFixedCosts + tieredPriceModifier + paperSizeIncrement;
+};
+
+// Function to calculate cost per sheet and total cost after profit margin and rounding
+const calculateCostPerSheetAndTotal = (
+  totalCostBeforeProfit: number,
+  totalPrint: number,
+): { costPerSheet: number; totalCost: number } => {
+  const calculatedCostPerSheet = roundToNearestHundred(
+    (totalCostBeforeProfit * PROFIT_MARGIN_MULTIPLIER) /
+      (totalPrint === 0 ? 1 : totalPrint),
+  );
+  const calculatedTotalCost = roundToNearestHundred(
+    calculatedCostPerSheet * totalPrint,
+  );
+  return {
+    costPerSheet: calculatedCostPerSheet,
+    totalCost: calculatedTotalCost,
+  };
 };
 
 // --- Component ---
@@ -97,10 +233,6 @@ const ScreenPrintingCalculator = () => {
     }
   };
 
-  const roundToNearestHundred = (value: number): number => {
-    return Math.round(value / 100) * 100;
-  };
-
   const calculateCosts = () => {
     setErrorMessage("");
     setLoading(true);
@@ -114,67 +246,46 @@ const ScreenPrintingCalculator = () => {
           );
         }
 
+        if (totalPrint < MINIMUM_PRINT_RUN) {
+          throw new Error(
+            `Minimum print quantity is ${MINIMUM_PRINT_RUN} sheets.`,
+          );
+        }
+
+        if (totalPrint > MAXIMUM_PRINT_RUN) {
+          throw new Error(`Total Prints cannot exceed ${MAXIMUM_PRINT_RUN}.`);
+        }
+
         const paperPrice = PAPER_PRICES[paperSize];
         if (paperPrice === undefined) {
           throw new Error("Invalid paper size selected.");
         }
 
-        // --- Determine Quantity Tier ---
-        const quantityTier = QUANTITY_TIERS.find(
-          (tier) => totalPrint <= tier.threshold,
+        // --- Cost Calculation using Helper Functions ---
+        const materialCost = getMaterialCost(colorCount);
+        const quantityFixedCostScale = getQuantityFixedCostScale(totalPrint);
+        const fixedCosts = calculateFixedCosts(
+          quantityFixedCostScale,
+          materialCost,
         );
-
-        if (!quantityTier) {
-          throw new Error("Could not determine quantity tier."); //Should never happen
-        }
-
-        const fixedCostScale = quantityTier.fixedCostScale;
-
-        // --- Cost Calculation ---
-        let materialCost = FIXED_COSTS.materialBasePrice;
-        if (colorCount > 2) {
-          materialCost += MATERIAL_COLOR_SURCHARGE;
-        }
-
-        // Apply scaling to fixed costs
-        const scaledProduction = FIXED_COSTS.production * fixedCostScale;
-        const scaledOverhead = FIXED_COSTS.overhead * fixedCostScale;
-        const scaledLabor = FIXED_COSTS.labor * fixedCostScale;
-
-        const totalFixedCosts =
-          materialCost + scaledProduction + scaledOverhead + scaledLabor;
-
-        // Scale the color price based on sheet count
-        let scaledColorPrice = COLOR_PRICE;
-        if (totalPrint > COLOR_PRICE_SCALE_THRESHOLD) {
-          scaledColorPrice = COLOR_PRICE * COLOR_PRICE_SCALE_FACTOR;
-        }
-        const totalColorCost = scaledColorPrice * colorCount;
-
-        let emulsionCost = 0;
-        if (colorCount >= 1 && colorCount <= 2) {
-          emulsionCost = EMULSION_PRICES_BY_COLOR_TIERS["1-2"];
-        } else if (colorCount >= 3 && colorCount <= 4) {
-          emulsionCost = EMULSION_PRICES_BY_COLOR_TIERS["3-4"];
-        } else if (colorCount >= 5 && colorCount <= 6) {
-          emulsionCost = EMULSION_PRICES_BY_COLOR_TIERS["5-6"];
-        } else if (colorCount >= 7 && colorCount <= 8) {
-          emulsionCost = EMULSION_PRICES_BY_COLOR_TIERS["7-8"];
-        } else if (colorCount >= 9) {
-          emulsionCost = EMULSION_PRICES_BY_COLOR_TIERS["9+"];
-        }
-
-        const totalCostBeforeProfit =
-          totalFixedCosts + paperPrice + totalColorCost + emulsionCost;
-
-        const calculatedCostPerSheet = roundToNearestHundred(
-          (totalCostBeforeProfit * PROFIT_MARGIN_MULTIPLIER) /
-            (totalPrint === 0 ? 1 : totalPrint),
+        const colorCost = calculateColorCost(colorCount, totalPrint);
+        const emulsionCost = getEmulsionCost(colorCount);
+        const tieredPriceModifier = calculateTieredPriceModifier(totalPrint);
+        const baseFixedCosts =
+          fixedCosts + paperPrice + colorCost + emulsionCost;
+        const paperSizeIncrement = calculatePaperSizeIncrement(
+          baseFixedCosts,
+          paperSize,
         );
-
-        const calculatedTotalCost = roundToNearestHundred(
-          calculatedCostPerSheet * totalPrint,
+        const totalCostBeforeProfit = calculateTotalCostBeforeProfit(
+          baseFixedCosts,
+          tieredPriceModifier,
+          paperSizeIncrement,
         );
+        const {
+          costPerSheet: calculatedCostPerSheet,
+          totalCost: calculatedTotalCost,
+        } = calculateCostPerSheetAndTotal(totalCostBeforeProfit, totalPrint);
 
         // --- State Update ---
         setCostPerSheet(calculatedCostPerSheet);
@@ -194,8 +305,6 @@ const ScreenPrintingCalculator = () => {
   const dimensions = PAPER_DIMENSIONS[paperSize];
   const displayWidth = dimensions?.width || 0;
   const displayHeight = dimensions?.height || 0;
-  const shouldShowMinimumPrintMessage =
-    totalPrint < MINIMUM_PRINT_RUN && totalPrint > 0;
 
   // --- Render ---
   return (
@@ -236,9 +345,15 @@ const ScreenPrintingCalculator = () => {
                   href="https://forms.fillout.com/t/pFE4XxyiXGus"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline hover:scale-110 hover:origin-center transition-transform duration-200 ease-in-out"
+                  className="text-primary hover:text-foreground relative inline-block group"
                 >
-                  Request a Quote here
+                  <span className="relative flex items-center z-20">
+                    Request a Quote here
+                    <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-foreground group-hover:w-full transition-all duration-300 ease-in-out"></span>
+                    <span>
+                      <LucideArrowUpRight size={16} className="ml-1" />
+                    </span>
+                  </span>
                 </a>
               </p>
 
@@ -395,13 +510,6 @@ const ScreenPrintingCalculator = () => {
                 </tbody>
               </table>
             </div>
-
-            {/* Minimum Print Run Message */}
-            {shouldShowMinimumPrintMessage && (
-              <p className="text-gray-600 mt-2 mx-6 text-sm ">
-                Minimum print run is {MINIMUM_PRINT_RUN} sheets.
-              </p>
-            )}
           </div>
 
           {/* Paper Size Display */}
