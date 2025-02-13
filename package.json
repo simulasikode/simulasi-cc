@@ -1,6 +1,6 @@
 {
   "name": "simulasi.studio",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -16,12 +16,11 @@
     "@heroicons/react": "^2.2.0",
     "@next/mdx": "^15.1.6",
     "@next/third-parties": "^15.1.6",
-    "@studio-freight/react-lenis": "^0.0.47",
     "@types/color-convert": "^2.0.4",
-    "@types/locomotive-scroll": "^4.1.4",
     "color-convert": "^3.0.0",
     "firebase": "^11.2.0",
     "gsap": "^3.12.7",
+    "jsonschema": "^1.5.0",
     "lenis": "^1.1.20",
     "locomotive-scroll": "^4.1.4",
     "lucide-react": "^0.474.0",
