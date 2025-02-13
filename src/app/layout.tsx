@@ -2,13 +2,13 @@
 import "./globals.css";
 import Menu from "@/components/Menu";
 import localFont from "next/font/local";
-import SmoothScrolling from "@/components/SmoothScrolling";
 import { GoogleTagManager } from "@next/third-parties/google";
 import GoogleAnalytics from "@/utils/GoogleAnalytics";
 import Footer from "@/components/Footer";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import MetadataComponent from "@/components/MetadataComponent";
+import SmoothScrolling from "@/components/SmoothScrolling";
 
 const SkRegular = localFont({
   src: "../../public/fonts/Sk-Modernist-Regular.otf",
@@ -42,23 +42,24 @@ export default function RootLayout({
       </head>
       <GoogleAnalytics />
       <body
-        className={`${SkRegular.variable} ${SkBold.variable} ${Skmono.variable} antialiased min-h-[100vh] p-[10px]`}
+        className={`${SkRegular.variable} ${SkBold.variable} ${Skmono.variable} antialiased min-h-[101vh] p-[10px]`}
       >
-        <GoogleTagManager gtmId="GTM-PBBJ4ZFZ" />
-
-        <Menu />
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-          >
-            <SmoothScrolling>{children}</SmoothScrolling>
-          </motion.div>
-        </AnimatePresence>
-        <Footer />
+        <SmoothScrolling>
+          <GoogleTagManager gtmId="GTM-PBBJ5ZFZ" />
+          <Menu />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 1, y: 10 }}
+              animate={{ opacity: 2, y: 0 }}
+              exit={{ opacity: 1, y: -10 }}
+              transition={{ duration: 1.3 }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+          <Footer />
+        </SmoothScrolling>
       </body>
     </html>
   );

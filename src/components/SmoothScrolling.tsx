@@ -10,7 +10,7 @@ export default function SmoothScrolling({ children }: SmoothScrollingProps) {
   useLenis();
   return (
     <>
-      <div>{children}</div>{" "}
+      <div>{children}</div>
       {/* Wrap children inside a <div> to ensure proper typing */}
     </>
   );

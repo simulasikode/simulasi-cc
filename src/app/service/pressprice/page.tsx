@@ -401,7 +401,7 @@ const ScreenPrintingCalculator = () => {
                   <input
                     type="number"
                     id="colorCount"
-                    className="mt-1 block w-full py-2 px-3 border border-primary bg-gray-200 dark:bg-gray-900 focus:outline-none focus:opacity-80 sm:text-sm"
+                    className="mt-1 block w-full py-2 px-3 border border-primary bg-gray-200 dark:bg-background focus:outline-none focus:opacity-80 sm:text-sm"
                     value={colorCount}
                     onChange={(e) =>
                       setColorCount(
@@ -424,7 +424,7 @@ const ScreenPrintingCalculator = () => {
                   <input
                     type="number"
                     id="totalPrints"
-                    className="mt-1 block w-full py-2 px-3 border border-primary bg-gray-200 dark:bg-gray-900 focus:outline-none focus:opacity-80 sm:text-sm"
+                    className="mt-1 block w-full py-2 px-3 border border-primary bg-gray-200 dark:bg-background focus:outline-none focus:opacity-80 sm:text-sm"
                     value={totalPrint}
                     onChange={(e) =>
                       setTotalPrint(
@@ -438,7 +438,7 @@ const ScreenPrintingCalculator = () => {
                 {/* Calculate Button */}
                 <button
                   onClick={calculateCosts}
-                  className="mb-4 bg-background hover:bg-primary border border-primary dark:bg-gray-900 dark:text-primary font-bold py-2 px-4 flex items-center"
+                  className="mb-4 bg-background hover:bg-primary border border-primary dark:bg-background dark:text-foreground font-bold py-2 px-4 flex items-center"
                   disabled={loading}
                   aria-label="Calculate Costs"
                 >
@@ -518,7 +518,7 @@ const ScreenPrintingCalculator = () => {
             aria-label={`Paper Size: ${paperSize} Dimensions: ${displayWidth}mm x ${displayHeight}mm`}
           >
             <div
-              className="border border-black flex flex-col justify-center items-start box-border mt-24 sm:mt-0 "
+              className="border border-primary dark:border-white flex flex-col justify-center items-start box-border mt-24 sm:mt-0 "
               style={{
                 width: displayWidth,
                 height: displayHeight,

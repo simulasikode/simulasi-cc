@@ -1,101 +1,105 @@
 "use client";
-import React, { useEffect, useState, JSX } from "react";
-import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
+import React, { useEffect, useState, useCallback, JSX } from "react";
 import { BsPalette2 } from "react-icons/bs";
 
-// Declare the theme types
-type Theme = "light" | "dark" | "red" | "green" | "blue";
+// --- Theme Definitions ---
 
-// Map the theme to its corresponding icon
-const themeIcons: Record<Theme, JSX.Element> = {
+type ThemeName = "light" | "dark" | "red" | "green" | "blue";
+
+const themeIcons: Record<ThemeName, JSX.Element> = {
   light: (
-    <SunIcon className="w-6 h-6 text-yellow-500 hover:opacity-80 transition-opacity duration-200" />
+    <BsPalette2 className="w-5 h-5 text-yellow-500 hover:opacity-80 transition-opacity duration-200" />
   ),
   dark: (
-    <MoonIcon className="w-6 h-6 text-gray-300 hover:opacity-80 transition-opacity duration-200" />
+    <BsPalette2 className="w-5 h-5 text-gray-300 hover:opacity-80 transition-opacity duration-200" />
   ),
   red: (
-    <BsPalette2 className="w-6 h-6 text-red-500 hover:opacity-80 transition-opacity duration-200" />
+    <BsPalette2 className="w-5 h-5 text-red-500 hover:opacity-80 transition-opacity duration-200" />
   ),
   green: (
-    <BsPalette2 className="w-6 h-6 text-green-500 hover:opacity-80 transition-opacity duration-200" />
+    <BsPalette2 className="w-5 h-5 text-green-500 hover:opacity-80 transition-opacity duration-200" />
   ),
   blue: (
-    <BsPalette2 className="w-6 h-6 text-blue-500 hover:opacity-80 transition-opacity duration-200" />
+    <BsPalette2 className="w-5 h-5 text-blue-500 hover:opacity-80 transition-opacity duration-200" />
   ),
 };
 
+// --- Component ---
+
 export default function ThemeSwitcher() {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [currentTheme, setTheme] = useState<ThemeName>("light");
 
-  // Function to update the CSS variable dynamically
-  const updateThemeColor = (theme: Theme) => {
-    switch (theme) {
-      case "light":
-        document.documentElement.style.setProperty(
-          "--theme-primary-color",
-          "#191919",
-        );
-        break;
-      case "dark":
-        document.documentElement.style.setProperty(
-          "--theme-primary-color",
-          "#fefdfa",
-        );
-        break;
-      case "red":
-        document.documentElement.style.setProperty(
-          "--theme-primary-color",
-          "#FF0000",
-        );
-        break;
-      case "green":
-        document.documentElement.style.setProperty(
-          "--theme-primary-color",
-          "##009900",
-        );
-        break;
-      case "blue":
-        document.documentElement.style.setProperty(
-          "--theme-primary-color",
-          "#0000FF",
-        );
-        break;
-      default:
-        document.documentElement.style.setProperty(
-          "--theme-primary-color",
-          "#f1c40f",
-        ); // Default to light
-    }
-  };
+  // Update the CSS variable for the primary theme color.
+  const updateThemeColor = useCallback((theme: ThemeName) => {
+    const colorMap: Record<ThemeName, string> = {
+      light: "#191919",
+      dark: "#fefdfa",
+      red: "#FF0000",
+      green: "#009900",
+      blue: "#0000FF",
+    };
 
-  // Initialize theme from localStorage or default to light
-  useEffect(() => {
-    const savedTheme = (localStorage.getItem("theme") as Theme) || "light";
-    setTheme(savedTheme);
-    updateThemeColor(savedTheme); // Set the theme color on load
-    document.documentElement.className = savedTheme;
+    document.documentElement.style.setProperty(
+      "--theme-primary-color",
+      colorMap[theme] || "#191919",
+    ); // Default to light
   }, []);
 
-  // Cycle through themes
-  const toggleTheme = () => {
-    const themes: Theme[] = ["light", "dark", "red", "green", "blue"];
-    const currentIndex = themes.indexOf(theme);
-    const nextIndex = (currentIndex + 1) % themes.length; // Loop back to 0 when we reach the end
+  // Load the saved theme from localStorage on component mount.
+  useEffect(() => {
+    try {
+      const savedTheme = localStorage.getItem("theme") as ThemeName | null;
+      const validThemes: ThemeName[] = [
+        "light",
+        "dark",
+        "red",
+        "green",
+        "blue",
+      ];
+
+      // Validate the saved theme, or default to "light".
+      const initialTheme =
+        savedTheme && validThemes.includes(savedTheme) ? savedTheme : "light";
+
+      setTheme(initialTheme);
+      updateThemeColor(initialTheme);
+      document.documentElement.className = initialTheme; // Apply class for immediate styling
+    } catch (error) {
+      console.error("Error loading theme from localStorage:", error);
+      // Fallback to light theme if localStorage fails.
+      setTheme("light");
+      updateThemeColor("light");
+      document.documentElement.className = "light";
+    }
+  }, [updateThemeColor]); //  Dependency on updateThemeColor (important for useCallback)
+
+  // Toggle to the next theme in the sequence.
+  const toggleTheme = useCallback(() => {
+    const themes: ThemeName[] = ["light", "dark", "red", "green", "blue"];
+    const currentIndex = themes.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % themes.length;
     const nextTheme = themes[nextIndex];
-    setTheme(nextTheme);
-    updateThemeColor(nextTheme); // Update the theme color dynamically
-    document.documentElement.className = nextTheme;
-    localStorage.setItem("theme", nextTheme); // Save theme choice to localStorage
-  };
+
+    try {
+      localStorage.setItem("theme", nextTheme);
+      setTheme(nextTheme);
+      updateThemeColor(nextTheme);
+      document.documentElement.className = nextTheme;
+    } catch (error) {
+      console.error("Error saving theme to localStorage:", error);
+      //  Optionally show a message to the user.
+    }
+  }, [currentTheme, updateThemeColor]); // Dependencies for useCallback
 
   return (
-    <div className="fixed top-2 left-2 z-10">
+    <div className="fixed top-2 left-2 z-20">
       <button
         onClick={toggleTheme}
         className="hover:bg-opacity-80 transition-colors duration-200 cursor-pointer"
+        aria-label={`Switch to ${currentTheme} theme`}
+        title={`Switch to ${currentTheme} theme`}
       >
-        {themeIcons[theme]}
+        {themeIcons[currentTheme]}
       </button>
     </div>
   );

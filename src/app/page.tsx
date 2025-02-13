@@ -3,18 +3,33 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { useInView } from "react-intersection-observer";
-import CaseStudies from "@/components/CaseStudies";
+import dynamic from "next/dynamic";
+
+const CaseStudies = dynamic(() => import("@/components/CaseStudies"), {
+  ssr: false,
+});
+
+const PrePress = dynamic(() => import("@/components/PrePress"), {
+  ssr: false,
+});
 
 // Custom hook for intersection observer
-const useSectionInView = (threshold = 0.2) => {
+const useSectionInView = (threshold = 0.5) => {
+  // Removed console logs for brevity
+  if (threshold < 0 || threshold > 1 || isNaN(threshold)) {
+    console.error("Invalid threshold value:", threshold);
+    threshold = 0.5;
+  }
+
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold,
   });
+
   return { ref, inView };
 };
 
-// Custom hook for parallax effect (now self-contained)
+// Custom hook for parallax effect
 const useParallax = (inputRange = [0, 1], outputRange = ["0%", "-10%"]) => {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -35,19 +50,16 @@ const HeroSection = () => {
   const { parallaxValue: parallaxHeadingOpacity } = useParallax(
     [0, 0.5],
     ["1", "0"],
-  ); // Change the output here
+  );
   const { ref: parallaxRef, parallaxValue: parallaxBg } = useParallax();
 
   return (
     <div ref={parallaxRef} style={{ transform: `translateY(${parallaxBg})` }}>
       <section className="relative top-48 w-full min-h-[100vh] flex flex-col items-center text-center bg-background overflow-hidden px-4 md:px-8 lg:px-16">
-        {/* Responsive Font Sizes */}
         <motion.h1
           ref={heroRef}
           style={{ y: parallaxHeadingY, opacity: parallaxHeadingOpacity }}
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, staggerChildren: 0.4 }}
+          // Removed initial and animate, relying on style for initial state
           className="text-3xl sm:text-4xl md:text-5xl lg:text-[75px] leading-[82%] tracking-tighter font-bold"
         >
           MANIFESTING YOUR VISION
@@ -56,9 +68,7 @@ const HeroSection = () => {
         </motion.h1>
         <motion.p
           style={{ opacity: parallaxHeadingOpacity }}
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 0 }}
-          transition={{ duration: 1, delay: 0.5 }}
+          // Removed initial and animate
           className="mt-2 text-regular text-sm text-muted-foreground max-w-xl"
         >
           Nothing is real, everything is simulation —
@@ -67,7 +77,7 @@ const HeroSection = () => {
             target="_blank"
             className="hover:underline"
           >
-            &quot;internet memes&quot;
+            &qout;internet memes&quot;
           </Link>
         </motion.p>
       </section>
@@ -98,7 +108,6 @@ const TextSection = () => {
       className="flex flex-col justify-between items-center min-h-[38vh] px-4 md:px-8 lg:px-16"
     >
       <div className="relative w-full">
-        {/* Responsive Width */}
         <motion.div
           ref={textRef}
           style={{ y: parallaxText }}
@@ -107,7 +116,6 @@ const TextSection = () => {
           variants={fadeInVariants}
           className="absolute top-0 right-0 w-[67vw] sm:w-[60vw] md:w-[72vw] lg:w-[50vw] xl:w-[78vw] z-10"
         >
-          {/* Responsive Font Sizes */}
           <h3 className="text-sm md:text-lg lg:text-xl leading-tight">
             It is the process of transforming creative ideas into actual
             designs. That is a transformation in the dynamic world of screen
@@ -158,7 +166,9 @@ export default function Home() {
           </motion.h2>
         </div>
         <TextSection />
+        {/* Keep your other components as needed */}
         <CaseStudies />
+        <PrePress />
       </main>
     </div>
   );

@@ -1,18 +1,15 @@
 "use client";
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { FaInstagram, FaGithub, FaYoutube } from "react-icons/fa";
 import { TbMenu } from "react-icons/tb";
 import { X } from "lucide-react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import ThemeSwitcher from "./ThemeSwitcher";
 
 const RGBBackground = dynamic(() => import("@/components/RGBBackground"), {
-  ssr: false,
-});
-
-const ThemeSwitcher = dynamic(() => import("@/components/ThemeSwitcher"), {
   ssr: false,
 });
 
@@ -121,7 +118,7 @@ const menuTextVariants = {
   hover: { opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } },
   unhover: {
     opacity: 0,
-    x: 10,
+    x: -10,
     transition: { duration: 0.3, ease: "easeOut" },
   },
   hidden: {
@@ -140,8 +137,9 @@ export default function Menu() {
     <>
       <ThemeSwitcher />
       <div className="sticky top-3 z-10 flex justify-center mx-auto text-xs text-white mix-blend-difference">
-        <Link href="/" className="hover:underline">
+        <Link href="/" className="group relative inline-block">
           Simulasi Studio • Screen printing service
+          <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-white group-hover:w-full transition-all duration-300"></span>
         </Link>
       </div>
       {!isOpen && (
@@ -223,7 +221,7 @@ export default function Menu() {
                       <motion.li
                         key={item.name}
                         variants={menuItemVariants}
-                        className="cursor-pointer text-base transition-colors hover:text-primary sm:text-lg"
+                        className="cursor-pointer text-base  sm:text-lg relative group" // Add group here
                         tabIndex={0}
                       >
                         {item.isExternal ? (
@@ -232,15 +230,19 @@ export default function Menu() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => setIsOpen(false)}
+                            className="relative z-10" // Add relative and z-index
                           >
                             {item.name}
+                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-foreground group-hover:w-full transition-all duration-300"></span>
                           </a>
                         ) : (
                           <Link
                             href={item.link}
                             onClick={() => setIsOpen(false)}
+                            className="relative z-10" // Add relative and z-index
                           >
                             {item.name}
+                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-foreground group-hover:w-full transition-all duration-300"></span>
                           </Link>
                         )}
                       </motion.li>
@@ -278,22 +280,26 @@ export default function Menu() {
                 © {new Date().getFullYear()} Simulasi Studio. All rights
                 reserved.
               </span>
-              <div className="flex space-x-4">
+              <div className="flex space-x-4 group">
+                {" "}
+                {/* Added group for footer links */}
                 <Link
                   href="/privacy-policy"
-                  className="hover:text-primary transition"
+                  className="relative z-10" // Add relative and z-index
                   onClick={() => setIsOpen(false)}
                   tabIndex={0}
                 >
                   Privacy Policy
+                  <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-muted-foreground group-hover:w-full transition-all duration-300"></span>
                 </Link>
                 <Link
                   href="/changelog"
-                  className="hover:text-primary transition"
+                  className="relative z-10" // Add relative and z-index
                   onClick={() => setIsOpen(false)}
                   tabIndex={0}
                 >
                   Changelog
+                  <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-muted-foreground group-hover:w-full transition-all duration-300"></span>
                 </Link>
               </div>
             </div>

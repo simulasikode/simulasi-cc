@@ -26,9 +26,18 @@ const CaseStudies: React.FC = () => {
         duration: 0.8,
         ease: "easeOut",
         delay: 0.2,
-        staggerChildren: 0.1,
-        when: "beforeChildren",
+        staggerChildren: 0.15,
+        delayChildren: 0.2,
       },
+    },
+  };
+
+  const listItemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
     },
   };
 
@@ -45,9 +54,14 @@ const CaseStudies: React.FC = () => {
     },
   };
 
+  const caseStudyTitles = [
+    "Project Dragon of sathar: CMYKOGV Screen Printing with waterbase ink — 2024",
+    "Project 65lpi Halftone: One color testing screen printing — 2024",
+  ];
+
   return (
-    <div ref={ref} className="relative mb-[150px]">
-      <div className="mt-[150px]">
+    <div ref={ref} className="relative mt-[64px]">
+      <div>
         <motion.div
           className="border-t border-primary w-[calc(100vw-20px)] z-2 top-0"
           variants={linkVariants}
@@ -59,7 +73,7 @@ const CaseStudies: React.FC = () => {
               className="text-[8.25px] uppercase"
               variants={linkVariants}
             >
-              Case Studies
+              01
             </motion.p>
             <Link
               href={"/"}
@@ -77,7 +91,8 @@ const CaseStudies: React.FC = () => {
           </div>
         </motion.div>
       </div>
-      <div className="absolute w-[calc(50vw-15px)] ml-[calc(50vw-5px)] mb-[150px]">
+      {/* Removed 'absolute' class and adjusted ml/mr for relative positioning */}
+      <div className="w-[calc(50vw-15px)] ml-[calc(50vw-5px)] relative mb-[32px] mt-[32px]">
         <motion.h1
           className="text-[50px] sm:text-[60px] md:text-[70px] lg:text-[90px] font-bold leading-[82%]"
           variants={titleVariants}
@@ -86,6 +101,22 @@ const CaseStudies: React.FC = () => {
         >
           Case Studies
         </motion.h1>
+        <motion.ul
+          className="mt-[30px] text-[16px]"
+          variants={titleVariants}
+          initial="hidden"
+          animate={controls}
+        >
+          {caseStudyTitles.map((title, index) => (
+            <motion.li
+              key={index}
+              variants={listItemVariants}
+              className="mb-2 text-[12px] leading-tight" // Added margin-bottom for spacing between list items
+            >
+              {title}
+            </motion.li>
+          ))}
+        </motion.ul>
       </div>
     </div>
   );
