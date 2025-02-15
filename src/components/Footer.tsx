@@ -45,9 +45,9 @@ const Footer = () => {
               </div>
             </div>
             <div className="flex justify-between items-end">
-              <h1 className="font-bold text-[12vw] leading-[82%] tracking-tighter mt-10">
+              <h5 className="font-bold text-[12vw] leading-[82%] tracking-tighter mt-10">
                 Simulasi Studio
-              </h1>
+              </h5>
               <p className="text-xs text-foreground mr-2 mb-2">
                 © {new Date().getFullYear()} Simulasi Studio. All rights
                 reserved.

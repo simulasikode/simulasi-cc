@@ -510,10 +510,10 @@ const ColorCalculator = () => {
     <div className={containerClasses}>
       <div className={sectionClasses}>
         <h1 className={headingClasses}>The Color Process</h1>
-        <p className="text-[22.5px] uppercase m-4 max-w-2xl leading-[82%] text-center">
+        <h2 className="text-[22.5px] uppercase m-4 max-w-2xl leading-[82%] text-center">
           Digital tools are designed to simplify the complex process of color
           mixing and conversion.
-        </p>
+        </h2>
         <p className="text-sm text-center max-w-lg leading-[92%]">
           These tools allow users to input color values from various models,
           such as CMYK and HSB. The ICC color profiles ensure accuracy across

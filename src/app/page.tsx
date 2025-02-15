@@ -62,7 +62,7 @@ const HeroSection = () => {
           // Removed initial and animate, relying on style for initial state
           className="text-3xl sm:text-4xl md:text-5xl lg:text-[75px] leading-[82%] tracking-tighter font-bold"
         >
-          MANIFESTING YOUR VISION
+          TURNING YOUR VISION
           <br />
           <span className="text-primary">INTO VIVID EXPRESSION</span>
         </motion.h1>
@@ -71,13 +71,15 @@ const HeroSection = () => {
           // Removed initial and animate
           className="mt-2 text-regular text-sm text-muted-foreground max-w-xl"
         >
-          Nothing is real, everything is simulation —
+          Nothing is real, everything is simulation —{" "}
           <Link
             href="https://ifunny.co/picture/nothing-is-really-real-it-s-all-a-simulation-wAtezlS5C"
             target="_blank"
-            className="hover:underline"
+            rel="noopener noreferrer" // Added rel attribute for security
+            className="group relative"
           >
-            &qout;internet memes&quot;
+            internet memes
+            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-foreground group-hover:w-full transition-all duration-300"></span>
           </Link>
         </motion.p>
       </section>
@@ -116,7 +118,7 @@ const TextSection = () => {
           variants={fadeInVariants}
           className="absolute top-0 right-0 w-[67vw] sm:w-[60vw] md:w-[72vw] lg:w-[50vw] xl:w-[78vw] z-10"
         >
-          <h3 className="text-sm md:text-lg lg:text-xl leading-tight">
+          <p className="text-sm md:text-lg lg:text-xl leading-tight">
             It is the process of transforming creative ideas into actual
             designs. That is a transformation in the dynamic world of screen
             printing. Artists and designers draw inspiration from their visions
@@ -128,7 +130,7 @@ const TextSection = () => {
             effectively through each print. The synergy between the artistry and
             tactile properties of paper enhances the overall experience, making
             each piece a unique manifestation of creativity.{" "}
-          </h3>
+          </p>
         </motion.div>
       </div>
     </section>
@@ -161,8 +163,8 @@ export default function Home() {
             animate={screenPrintingTextInView ? "visible" : "hidden"}
             className="text-xs font-regular w-[20.4vw] sm:w-[7.3vw] leading-[92%]"
           >
-            screen printing techniques to discover the joy of achievable
-            artistic surprises.
+            Use screen printing techniques to discover the joy of creating
+            unexpected artistic surprises.
           </motion.h2>
         </div>
         <TextSection />

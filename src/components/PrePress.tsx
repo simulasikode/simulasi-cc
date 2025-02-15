@@ -96,14 +96,14 @@ const PrePress: React.FC = () => {
         </motion.div>
       </div>
       <div className=" w-[calc(51vw-15px)] ml-[calc(50vw-5px)] mb-[150px] mt-[32px]">
-        <motion.h2
+        <motion.h3
           className="text-[51px] sm:text-[60px] md:text-[70px] lg:text-[90px] font-bold leading-[82%]"
           variants={titleVariants}
           initial="hidden"
           animate={controls}
         >
           Prepress
-        </motion.h2>
+        </motion.h3>
         <motion.ul
           className="flex justify-start space-x-1 mt-[30px] text-[12px]"
           variants={titleVariants} // Apply titleVariants to the ul for stagger effect

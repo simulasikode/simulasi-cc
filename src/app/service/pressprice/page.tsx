@@ -314,9 +314,9 @@ const ScreenPrintingCalculator = () => {
         <h1 className="relative text-5xl md:text-[75px] font-bold text-center mb-2 uppercase leading-[82%] tracking-tighter">
           PressPrice
         </h1>
-        <p className="text-[22.5px] text-center uppercase m-2 leading-[82%]">
+        <h2 className="text-[22.5px] text-center uppercase m-2 leading-[82%]">
           Easily estimate the costs of screen printing projects
-        </p>
+        </h2>
         <p className="text-sm text-center max-w-lg leading-[92%]">
           The Screen Printing Calculator is a user-friendly tool designed to
           estimate the costs associated with hand-pulled screen printing on

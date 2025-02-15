@@ -93,14 +93,14 @@ const CaseStudies: React.FC = () => {
       </div>
       {/* Removed 'absolute' class and adjusted ml/mr for relative positioning */}
       <div className="w-[calc(50vw-15px)] ml-[calc(50vw-5px)] relative mb-[32px] mt-[32px]">
-        <motion.h1
+        <motion.h3
           className="text-[50px] sm:text-[60px] md:text-[70px] lg:text-[90px] font-bold leading-[82%]"
           variants={titleVariants}
           initial="hidden"
           animate={controls}
         >
           Case Studies
-        </motion.h1>
+        </motion.h3>
         <motion.ul
           className="mt-[30px] text-[16px]"
           variants={titleVariants}
