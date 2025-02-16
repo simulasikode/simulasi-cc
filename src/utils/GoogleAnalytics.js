@@ -18,6 +18,11 @@ function Home() {
         async
         src={`https://www.googletagmanager.com/gtag/js?id=AW-11462618511`}
       ></Script>
+      <Script
+        type="text/javascript"
+        charset="UTF-8"
+        src="//cdn.cookie-script.com/s/52f389459f95adaadd827e990e2225e0.js"
+      ></Script>
     </>
   );
 }

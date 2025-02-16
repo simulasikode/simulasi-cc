@@ -211,10 +211,9 @@ export default function RootLayout({
         className={`${SkRegular.variable} ${SkBold.variable} ${Skmono.variable} antialiased min-h-[101vh] p-[10px]`}
       >
         <SmoothScrolling>
-          <GoogleTagManager gtmId="GTM-PBBJ5ZFZ" />
           <Menu />
           {children}
-
+          <GoogleTagManager gtmId="GTM-PCWP9Z52" />
           <Footer />
         </SmoothScrolling>
       </body>
